@@ -8,7 +8,7 @@
   body { background-image:radial-gradient(circle, rgba(40,30,30,.22) 1px, transparent 1.3px); background-size:26px 26px; }
 
   .top { position:fixed; left:0; right:0; top:0; display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; padding:24px 32px; z-index:10; }
-  .brand { position:fixed; left:50%; top:58vh; transform:translate(-50%,-50%); z-index:0; white-space:nowrap; font-family:Anton, Impact, sans-serif; font-size:7.9vw; line-height:.9; text-transform:uppercase; letter-spacing:.005em; color:#151313; pointer-events:none; }
+  .brand { position:fixed; left:50%; top:58vh; transform:translate(-50%,-50%); z-index:0; white-space:nowrap; font-family:Anton, Impact, sans-serif; font-size:7.9vw; line-height:.9; text-transform:uppercase; letter-spacing:.005em; color:#151313; pointer-events:none; transition:opacity .6s, transform .8s; }
   .top::before { content:''; position:absolute; inset:0 0 -60px 0; z-index:-1; pointer-events:none; background:linear-gradient(to bottom, #f1ece2 0%, #f1ece2 62%, rgba(241,236,226,0) 100%); }
   .prog { display:flex; flex-direction:column; align-items:center; gap:10px; }
   .prog #progLabel { font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
@@ -76,6 +76,7 @@
 
   .finale { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:22px; z-index:6; opacity:0; pointer-events:none; transition:opacity 1s .4s; }
   .finale.on { opacity:1; pointer-events:auto; }
+  body.finished .brand { opacity:0; transform:translate(-50%,-50%) scale(1.06); }
   .finale h1 { font-family:Anton, Impact, sans-serif; font-weight:400; text-transform:uppercase; font-size:clamp(48px,7vw,104px); line-height:.92; margin:0; }
   .finale p { font-size:13px; text-transform:uppercase; letter-spacing:.06em; margin:0; }
   .finale .send { font-size:28px; padding:18px 26px; }
@@ -280,6 +281,7 @@ function finish() {
   setProgress();
   const stage = document.getElementById('stage');
   stage.style.opacity = 0; stage.style.transform = 'translateY(-64%)';
+  document.body.classList.add('finished');   // the wordmark makes way for the closing line
   document.getElementById('finale').classList.add('on');
 }
 
