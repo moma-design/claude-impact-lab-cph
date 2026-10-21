@@ -12,7 +12,7 @@ import {
 import { EXAMPLE_PERSON_NAME } from "@/lib/example-person";
 
 import { FeelingScale } from "./feeling-scale";
-import { ErrorNote, primaryButton, quietLink } from "./ui";
+import { ErrorNote, Eyebrow, primaryButton, quietLink } from "./ui";
 
 interface StartScreenProps {
   onStart: (profile: Profile, feeling: number | null) => void;
@@ -64,13 +64,18 @@ export function StartScreen({ onStart, onExample, busy, error }: StartScreenProp
   const shownError = localError ?? error;
 
   return (
-    <main className="mx-auto w-full max-w-[680px] px-6 py-16 sm:py-24">
-      <p className="text-[13px] font-medium tracking-normal text-muted">{APP_NAME}</p>
+    <main className="relative mx-auto w-full max-w-[680px] px-6 py-16 sm:py-24">
+      <Eyebrow>{APP_NAME}</Eyebrow>
 
-      <h1 className="mt-6 text-[32px] leading-[1.15] font-semibold text-ink sm:text-[42px]">
-        {TAGLINE}
+      <h1 className="display mt-6 text-[44px] sm:text-[64px]">
+        The world
+        <br />
+        is yours.
       </h1>
-      <p className="mt-5 text-[17px] leading-relaxed text-muted">{SUPPORTING_LINE}</p>
+      <p className="strap mt-6 max-w-[34ch] text-ink">{TAGLINE}</p>
+      <p className="mt-5 max-w-[60ch] text-[14px] leading-relaxed text-muted">
+        {SUPPORTING_LINE}
+      </p>
 
       <form onSubmit={handleSubmit} className="mt-12 space-y-10">
         <FeelingScale
@@ -80,14 +85,11 @@ export function StartScreen({ onStart, onExample, busy, error }: StartScreenProp
           onChange={setFeeling}
         />
 
-        <div className="border-t border-line pt-10">
-          <label
-            htmlFor="linkedin-pdf"
-            className="block text-[15px] font-medium text-ink"
-          >
+        <div className="border-t border-dashed border-line pt-10">
+          <label htmlFor="linkedin-pdf" className="label block">
             Your LinkedIn profile, as a PDF
           </label>
-          <p id="linkedin-pdf-help" className="mt-2 text-[14px] text-muted">
+          <p id="linkedin-pdf-help" className="mt-2 text-[14px] leading-relaxed text-muted">
             On your LinkedIn profile, click Resources, then Save to PDF.
           </p>
           <input
@@ -101,18 +103,15 @@ export function StartScreen({ onStart, onExample, busy, error }: StartScreenProp
               setFile(event.target.files?.[0] ?? null);
               setLocalError(null);
             }}
-            className="mt-4 block w-full cursor-pointer rounded-lg border border-line bg-surface p-3 text-[14px] text-muted file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-accent-soft file:px-4 file:py-2 file:text-[14px] file:font-medium file:text-accent"
+            className="paper-card mt-4 block w-full cursor-pointer rounded-[4px] p-3 text-[14px] text-muted file:mr-4 file:cursor-pointer file:rounded-[3px] file:border-0 file:bg-ink file:px-4 file:py-2 file:text-[12px] file:font-bold file:tracking-[0.12em] file:text-canvas file:uppercase"
           />
         </div>
 
         <div>
-          <label
-            htmlFor="profile-text"
-            className="block text-[15px] font-medium text-ink"
-          >
+          <label htmlFor="profile-text" className="label block">
             Or paste your profile text
           </label>
-          <p id="profile-text-help" className="mt-2 text-[14px] text-muted">
+          <p id="profile-text-help" className="mt-2 text-[14px] leading-relaxed text-muted">
             Headline, about, roles and skills is plenty.
           </p>
           <textarea
@@ -125,7 +124,7 @@ export function StartScreen({ onStart, onExample, busy, error }: StartScreenProp
               setPastedText(event.target.value);
               setLocalError(null);
             }}
-            className="mt-4 w-full resize-y rounded-lg border border-line bg-surface p-4 text-[15px] leading-relaxed text-ink placeholder:text-muted"
+            className="paper-card mt-4 w-full resize-y rounded-[4px] p-4 text-[14px] leading-relaxed text-ink placeholder:text-muted"
             placeholder="Senior clinical pharmacist, acute medicine. Nineteen years in hospital pharmacy..."
           />
         </div>
@@ -134,19 +133,18 @@ export function StartScreen({ onStart, onExample, busy, error }: StartScreenProp
 
         <div className="flex flex-col gap-5">
           <button type="submit" className={primaryButton} disabled={busy}>
-            {busy ? "Starting" : "Start the conversation"}
+            {busy ? "Starting" : "Start"}
           </button>
-          <p className="text-[13px] text-muted">Nothing is saved.</p>
+          <p className="text-[12px] tracking-[0.1em] text-muted uppercase">Nothing is saved.</p>
         </div>
       </form>
 
-      <div className="mt-12 border-t border-line pt-8">
+      <div className="mt-12 border-t border-dashed border-line pt-8">
         <button type="button" onClick={onExample} className={quietLink} disabled={busy}>
           Try with an example person
         </button>
-        <p className="mt-2 text-[13px] text-muted">
-          {EXAMPLE_PERSON_NAME}. A fictional profile and conversation, written for this
-          demo. It goes straight to the results.
+        <p className="mt-3 text-[14px] leading-relaxed text-muted">
+          {EXAMPLE_PERSON_NAME}. A fictional profile, written for this demo.
         </p>
       </div>
     </main>

@@ -12,18 +12,18 @@ interface FeelingScaleProps {
 export function FeelingScale({ name, legend, value, onChange }: FeelingScaleProps) {
   return (
     <fieldset>
-      <legend className="text-[15px] font-medium text-ink">{legend}</legend>
+      <legend className="label">{legend}</legend>
       <div className="mt-4 flex flex-wrap gap-2" role="none">
         {VALUES.map((option) => {
           const checked = value === option;
           return (
             <label
               key={option}
-              className={`flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border text-[15px] transition-colors ${
+              className={`flex h-11 w-11 cursor-pointer items-center justify-center rounded-[3px] text-[14px] font-bold transition-[scale] hover:scale-[1.06] ${
                 checked
-                  ? "border-accent bg-accent font-medium text-white"
-                  : "border-line bg-surface text-muted hover:border-ink hover:text-ink"
-              } has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent`}
+                  ? "bg-ink text-amber"
+                  : "paper-card text-ink"
+              } has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-ink`}
             >
               <input
                 type="radio"
@@ -38,7 +38,7 @@ export function FeelingScale({ name, legend, value, onChange }: FeelingScaleProp
           );
         })}
       </div>
-      <p className="mt-3 flex justify-between text-[13px] text-muted">
+      <p className="mt-3 flex justify-between text-[12px] tracking-[0.1em] text-muted uppercase">
         <span>1, worried</span>
         <span aria-live="polite">
           {value === null ? "Nothing chosen yet" : `Chosen: ${value} of 10`}
