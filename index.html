@@ -146,7 +146,7 @@ url.addEventListener('input', () => {
   const full = v.includes('linkedin.com/in/');
   if (full) url.value = m ? m[1] : v.replace(/^.*linkedin\.com\/in\//, '');   // keep just the handle; the prefix shows the rest
   urlbox.classList.toggle('valid', !!m);
-  urlnote.textContent = !v ? '' : m ? `linkedin.com/in/${m[1]}` : 'That does not look like a profile link yet.';
+  urlnote.textContent = !v || m ? '' : 'That does not look like a profile link yet.';
 });
 
 // rings + ripples, same language as the results page

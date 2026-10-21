@@ -19,7 +19,7 @@
   .segs i.on { background:#151313; }
   .segs i.now { background:linear-gradient(90deg,#ff6fae,#ffc13a); }
 
-  .log { flex:1; overflow-y:auto; padding:28px 4px 20px; scroll-behavior:smooth; }
+  .log { flex:1; overflow-y:auto; padding:28px 4px 20px; scroll-behavior:smooth; -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 36px); mask-image:linear-gradient(to bottom, transparent 0, #000 36px); }
   .msg { margin-bottom:26px; animation:rise .45s cubic-bezier(.2,.8,.2,1) both; }
   @keyframes rise { from { opacity:0; transform:translateY(10px); } }
   .who { font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; opacity:.6; margin-bottom:8px; }
