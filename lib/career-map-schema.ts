@@ -7,8 +7,6 @@ import { z } from "zod";
  * sent to the API stays inside the supported subset. Counts are checked in
  * `app/api/map/route.ts` after parsing instead.
  */
-export const WORK_TYPES = ["fractional", "polywork", "new field"] as const;
-
 export const CareerMapSchema = z.object({
   strengths: z.array(
     z.object({
@@ -16,13 +14,22 @@ export const CareerMapSchema = z.object({
       line: z.string(),
     }),
   ),
-  paths: z.array(
+  /** Jobs they could do now, from what they already have. */
+  now_jobs: z.array(
     z.object({
-      type: z.enum(WORK_TYPES),
       title: z.string(),
       why_it_fits: z.string(),
-      week: z.array(z.string()),
-      human_part: z.string(),
+      skills_used: z.array(z.string()),
+    }),
+  ),
+  /** Jobs within reach after some learning, each with a plan. */
+  reach: z.array(
+    z.object({
+      title: z.string(),
+      why_it_fits: z.string(),
+      gap: z.array(z.string()),
+      plan: z.array(z.object({ when: z.string(), what: z.string() })),
+      search_for: z.array(z.string()),
     }),
   ),
   step_this_week: z.object({
@@ -37,33 +44,38 @@ export const CareerMapSchema = z.object({
     what_i_want_next: z.string(),
     watching_for: z.array(z.string()),
   }),
+  invented_role: z.object({
+    name: z.string(),
+    pitch: z.string(),
+    first_move: z.string(),
+  }),
   closing_line: z.string(),
 });
 
 export type CareerMap = z.infer<typeof CareerMapSchema>;
-export type WorkType = (typeof WORK_TYPES)[number];
-
-export const WORK_TYPE_LABELS: Record<WorkType, string> = {
-  fractional: "Fractional role",
-  polywork: "Polywork combination",
-  "new field": "New field",
-};
 
 /** Builds flow.md from the validated results, so the headings are guaranteed. */
 export function buildFlowMarkdown(map: CareerMap): string {
-  const directions = map.paths
-    .map(
-      (path) =>
-        `### ${path.title} (${WORK_TYPE_LABELS[path.type]})\n\n` +
-        `${path.why_it_fits}\n\n` +
-        `A week could look like:\n${path.week.map((line) => `- ${line}`).join("\n")}\n\n` +
-        `The human part: ${path.human_part}`,
-    )
-    .join("\n\n");
-
   const strengths = map.strengths
     .map((strength) => `- **${strength.title}.** ${strength.line}`)
     .join("\n");
+
+  const nowJobs = map.now_jobs
+    .map(
+      (job) =>
+        `### ${job.title}\n\n${job.why_it_fits}\n\nUses: ${job.skills_used.join(", ")}`,
+    )
+    .join("\n\n");
+
+  const reach = map.reach
+    .map(
+      (job) =>
+        `### ${job.title}\n\n${job.why_it_fits}\n\n` +
+        `To learn: ${job.gap.join(", ")}\n\n` +
+        `Plan:\n${job.plan.map((step) => `- ${step.when}: ${step.what}`).join("\n")}\n\n` +
+        `Search for: ${job.search_for.join("; ")}`,
+    )
+    .join("\n\n");
 
   return `# My flow
 
@@ -71,7 +83,7 @@ export function buildFlowMarkdown(map: CareerMap): string {
 
 ${map.flow.where_i_come_from}
 
-## What LinkedIn doesn't show
+## What my CV doesn't show
 
 ${map.flow.what_linkedin_does_not_show}
 
@@ -83,9 +95,21 @@ ${strengths}
 
 ${map.flow.what_i_want_next}
 
-## Directions
+## The role I invented
 
-${directions}
+### ${map.invented_role.name}
+
+${map.invented_role.pitch}
+
+First move: ${map.invented_role.first_move}
+
+## Jobs I could do now
+
+${nowJobs}
+
+## Within reach, with some learning
+
+${reach}
 
 ## This week's step
 

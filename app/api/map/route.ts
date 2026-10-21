@@ -2,13 +2,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 
 import type { ChatMessage, Profile } from "@/lib/app-config";
 import { stripMarkers } from "@/lib/app-config";
-import {
-  buildFlowMarkdown,
-  CareerMapSchema,
-  WORK_TYPES,
-  type CareerMap,
-  type WorkType,
-} from "@/lib/career-map-schema";
+import { buildFlowMarkdown, CareerMapSchema, type CareerMap } from "@/lib/career-map-schema";
 import { describeError, getClient, MODEL } from "@/lib/server/claude";
 import { profileBlocks } from "@/lib/server/profile";
 import { MAP_SYSTEM_PROMPT, mapUserPrompt } from "@/lib/server/prompts";
@@ -39,21 +33,23 @@ function normalise(map: CareerMap): CareerMap | null {
   const strengths = map.strengths.filter((s) => s.title && s.line).slice(0, 5);
   if (strengths.length < 3) return null;
 
-  const byType = new Map<WorkType, CareerMap["paths"][number]>();
-  for (const path of map.paths) {
-    if (!byType.has(path.type) && path.title && path.why_it_fits) {
-      byType.set(path.type, { ...path, week: path.week.filter(Boolean).slice(0, 3) });
-    }
-  }
-  if (byType.size !== WORK_TYPES.length) return null;
-  const paths = WORK_TYPES.map((type) => byType.get(type)!);
+  const now_jobs = map.now_jobs.filter((j) => j.title && j.why_it_fits).slice(0, 5);
+  if (now_jobs.length < 3) return null;
+
+  const reach = map.reach
+    .filter((j) => j.title && j.why_it_fits && j.plan.length > 0)
+    .slice(0, 4)
+    .map((j) => ({ ...j, plan: j.plan.slice(0, 5), search_for: j.search_for.slice(0, 4) }));
+  if (reach.length < 2) return null;
+
+  if (!map.invented_role.name || !map.invented_role.pitch) return null;
 
   if (!map.step_this_week.action || !map.step_this_week.who_to_talk_to) return null;
 
   const watching = map.flow.watching_for.filter(Boolean).slice(0, 6);
   if (watching.length === 0) return null;
 
-  return { ...map, strengths, paths, flow: { ...map.flow, watching_for: watching } };
+  return { ...map, strengths, now_jobs, reach, flow: { ...map.flow, watching_for: watching } };
 }
 
 export async function POST(request: Request) {

@@ -6,10 +6,10 @@
 /** Working title. Rename here and the whole interface follows. */
 export const APP_NAME = "Career advisor";
 
-export const TAGLINE = "Your career, read from what you know rather than your job title.";
+export const TAGLINE = "Find the skills you didn't know you had, and invent the role only you could do.";
 
 export const SUPPORTING_LINE =
-  "Start with your LinkedIn profile, add the five things it does not show, and leave with a flow.md file of your own and a live read on what is changing.";
+  "Tell us what you do in one line. We deal you the skills, show you careers you didn't know existed, and you invent the role that's yours.";
 
 /** The interview questions, in order. Shown to the person as "Question n of 5". */
 export const QUESTIONS = [
