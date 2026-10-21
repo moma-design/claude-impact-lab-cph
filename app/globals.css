@@ -1,15 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-canvas: #fbfaf8;
-  --color-surface: #ffffff;
-  --color-ink: #141414;
-  --color-muted: #55534e;
-  --color-line: #e2dfd9;
-  --color-accent: #15605a;
-  --color-accent-soft: #eef4f3;
+  --color-canvas: #f1ece2;
+  --color-surface: #fbf8f1;
+  --color-ink: #151313;
+  --color-muted: #5a5148;
+  --color-line: rgba(21, 19, 19, 0.28);
+  --color-accent: #151313;
+  --color-accent-soft: #ffe36a;
+  --color-pink: #ff6fae;
+  --color-yellow: #ffe500;
+  --color-orange: #ff8a4d;
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-mono), ui-monospace, monospace;
+  --font-display: var(--font-anton), Impact, sans-serif;
 }
 
 html {
@@ -18,13 +22,15 @@ html {
 
 body {
   background-color: var(--color-canvas);
+  background-image: radial-gradient(rgba(21, 19, 19, 0.16) 1px, transparent 1px);
+  background-size: 26px 26px;
   color: var(--color-ink);
   font-synthesis-weight: none;
   letter-spacing: 0;
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-ink);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -40,7 +46,6 @@ body {
   }
 }
 
-/* A quiet pulse while Claude is thinking. */
 @keyframes thinking-pulse {
   0%,
   100% {
@@ -63,6 +68,46 @@ body {
   animation-delay: 0.4s;
 }
 
+@keyframes float-card {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--tilt, 0deg));
+  }
+  50% {
+    transform: translateY(-10px) rotate(calc(var(--tilt, 0deg) * -0.6));
+  }
+}
+
+.float-card {
+  animation: float-card 6s ease-in-out infinite;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) rotate(-3deg) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.card-in {
+  animation: card-in 0.35s ease-out both;
+}
+
+.hard-shadow {
+  box-shadow: 4px 4px 0 var(--color-ink);
+}
+
+.line-clamp-5 {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 @media print {
   .no-print {
     display: none !important;
@@ -71,15 +116,5 @@ body {
   body {
     background: #fff;
     color: #000;
-  }
-
-  .print-plain {
-    border: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-  }
-
-  .print-break-avoid {
-    break-inside: avoid;
   }
 }

@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Anton, JetBrains_Mono } from "next/font/google";
 
 import { APP_NAME, TAGLINE } from "@/lib/app-config";
 
 import "./globals.css";
 
-const inter = Inter({
+const anton = Anton({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: "400",
+  variable: "--font-anton",
+  display: "swap",
+});
+
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -20,7 +27,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-GB" className={inter.variable}>
+    <html lang="en-GB" className={`${anton.variable} ${mono.variable}`}>
       <body className="min-h-screen font-sans antialiased">{children}</body>
     </html>
   );
