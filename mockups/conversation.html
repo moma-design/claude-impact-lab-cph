@@ -75,6 +75,25 @@
   .finale h1 { font-family:Anton, Impact, sans-serif; font-weight:400; text-transform:uppercase; font-size:clamp(48px,7vw,104px); line-height:.92; margin:0; }
   .finale p { font-size:13px; text-transform:uppercase; letter-spacing:.06em; margin:0; }
   .finale .send { font-size:28px; padding:18px 26px; }
+
+  /* ---- hard: square corners, thick ink outlines, offset shadows, no glass ---- */
+  .q { border-radius:0; border:2.5px solid #151313; backdrop-filter:none; -webkit-backdrop-filter:none; box-shadow:8px 8px 0 #151313; }
+  .q.now { background:#fbf8f1; }
+  .q:not(.now) { background:#ebe5d9; border-color:rgba(21,19,19,.35); box-shadow:5px 5px 0 rgba(21,19,19,.3); }
+  .q::before { display:none; }
+  .q textarea, .q .answer { border-radius:0; border:2px solid #151313; background:#fff; }
+  .q .answer { border-left-width:6px; }
+  .pill { border-radius:0; border:2px solid #151313; background:#fff; backdrop-filter:none; -webkit-backdrop-filter:none; box-shadow:3px 3px 0 #151313; }
+  .pill:hover { transform:translate(-1px,-1px); box-shadow:4px 4px 0 #151313; }
+  .pill.on { box-shadow:3px 3px 0 #ff6fae; }
+  .pills.picked .pill { box-shadow:none; }
+  .send { border-radius:0; box-shadow:5px 5px 0 #ff6fae; }
+  .send:hover { transform:translate(-2px,-2px); box-shadow:7px 7px 0 #ff6fae; }
+  .send:active { transform:translate(3px,3px); box-shadow:2px 2px 0 #ff6fae; }
+  .job { border-radius:0; border:2px solid #151313; box-shadow:4px 4px 0 #151313; }
+  .step b { border-radius:0; border:2.5px solid #151313; background:#fbf8f1; backdrop-filter:none; -webkit-backdrop-filter:none; }
+  .step.now b { box-shadow:4px 4px 0 #151313; }
+  .segs::before, .segs .fill { border-radius:0; height:4px; }
 </style></head>
 <body>
 <div class="brand" aria-hidden="true">The Dream Job Configurator</div>
