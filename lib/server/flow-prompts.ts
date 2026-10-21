@@ -44,6 +44,7 @@ If a direction is clearly right for this person but no page turned up for it, re
 For each opportunity:
 - title: plain and specific.
 - type: exactly one of opening, emerging role, fractional, polywork, new field.
+- skills: four to six skills the role needs, each with a status. Where a skill is one the person already confirmed, copy their skill name exactly as it was given to you and set status "held" for a confirmed skill or "hidden" for one of their hidden skills. For anything they do not yet have, write the skill in three or four words and set status "to collect". At least two should be ones they hold. The status you send is checked against their own list, so copying the name exactly is what makes it count.
 - why_you: one or two lines addressed to them, naming the skills of theirs it draws on, including their hidden skills. Be specific about which skill, not general encouragement.
 - skill_to_add: one skill they would need to add, in a few words.
 - learning_resource_title and learning_resource_url: a course, guide or programme you actually found in the search results that teaches that skill. If you did not find one, leave both as an empty string. Never invent a URL.
@@ -58,7 +59,7 @@ Rules:
 Finish your reply with the opportunities as JSON inside a fenced block marked json, and nothing after it:
 
 \`\`\`json
-{"opportunities":[{"title":"...","type":"opening","why_you":"...","skill_to_add":"...","learning_resource_title":"...","learning_resource_url":"...","source_title":"...","source_url":"https://..."}]}
+{"opportunities":[{"title":"...","type":"opening","skills":[{"name":"...","status":"held"},{"name":"...","status":"hidden"},{"name":"...","status":"to collect"}],"why_you":"...","skill_to_add":"...","learning_resource_title":"...","learning_resource_url":"...","source_title":"...","source_url":"https://..."}]}
 \`\`\``;
 
 export interface OpportunitiesRequestContext {
@@ -163,7 +164,7 @@ Return:
 
 1. role_title: the role in three to six plain words.
 
-2. cards: six to eight skills someone in this role needs. For each:
+2. cards: six to eight skills someone in this role needs. Begin with the skills already shown to the person on the role card, keeping their names exactly, then add the others the role needs. For each:
    - name: three or four words.
    - matches_skill: if the card is covered by one of the person's own skills, copy that skill's name exactly as it was given to you. Otherwise an empty string. Be honest: a rough overlap is not a match.
    - how_to_earn: for a card they do not yet hold, one concrete thing they could do in 30 to 60 minutes to make a real start. Something they could begin tonight, not a course to enrol on. For a card they do hold, one line on how they would show it.
@@ -191,11 +192,45 @@ export function levelUpUserPrompt(options: {
   opportunityType: string;
   whyYou: string;
   skills: Skill[];
+  badges?: { name: string; status: string }[];
 }): string {
   return [
     `I am considering this: ${options.opportunityTitle} (${options.opportunityType}).`,
     `Why it was suggested to me: ${options.whyYou}`,
     `My own skills, exactly as I confirmed them:\n${skillLines(options.skills)}`,
+    options.badges?.length
+      ? `The role card already showed me these skills, so your deck has to include them with the same names:\n${options.badges
+          .map((badge) => `- ${badge.name} (${badge.status})`)
+          .join("\n")}`
+      : "",
     "Build the skill deck for that role, and find me published material about people who already do it. Prefer video.",
-  ].join("\n\n");
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+/* Role video, fetched per card */
+
+export const ROLE_VIDEO_SYSTEM_PROMPT = `You find one piece of published material in which a person talks about doing a particular job.
+
+Search the web for interviews, conference talks, panels and podcast episodes on YouTube or Vimeo, in those words, and take the video page you actually find in the results.
+
+Return one item:
+- kind: "video" for a YouTube or Vimeo page, "article" for a written interview, profile or podcast page, "community" for a group, network or event to join.
+- title: as it appears on the page.
+- why_watch: one line on what someone considering this role will get from it.
+- source_url: copied character for character from the search result, including any query string and any time parameter. A URL you did not see in a result is thrown away before anyone sees it, so never write one from memory.
+
+Prefer video. If no video turns up, use an article or podcast page. If no published story turns up at all, give a community or event instead, also from the search results. Only public, published material: never a personal LinkedIn profile, never contact details, never a private individual who has not published.
+
+Plain, warm British English. No emoji, no dashes used as punctuation, no exclamation marks.
+
+Finish your reply with the item as JSON inside a fenced block marked json, and nothing after it:
+
+\`\`\`json
+{"kind":"video","title":"...","why_watch":"...","source_url":"https://..."}
+\`\`\``;
+
+export function roleVideoUserPrompt(roleTitle: string): string {
+  return `Find me a video of someone talking about working as: ${roleTitle}. An interview, a talk or a podcast episode. Search now.`;
 }

@@ -6,9 +6,11 @@ import {
   type LevelUpCard,
   type LevelUpStory,
   type Skill,
+  type SkillBadge,
 } from "@/lib/flow/types";
 import { describeError, getClient, MODEL } from "@/lib/server/claude";
 import { LEVEL_UP_SYSTEM_PROMPT, levelUpUserPrompt } from "@/lib/server/flow-prompts";
+import { statusForSkill } from "@/lib/server/skill-status";
 import {
   collectSourceUrls,
   collectStrictUrls,
@@ -29,6 +31,7 @@ interface LevelUpRequest {
   opportunityType?: string;
   whyYou?: string;
   skills?: Skill[];
+  badges?: SkillBadge[];
   isExample?: boolean;
 }
 
@@ -75,6 +78,7 @@ export async function POST(request: Request) {
           opportunityType: body.opportunityType ?? "role",
           whyYou: body.whyYou ?? "",
           skills,
+          badges: body.badges,
         }),
       },
     ];
@@ -116,8 +120,13 @@ export async function POST(request: Request) {
       .filter((card) => card.name.trim())
       .slice(0, 8)
       .map((card) => {
+        // The same rule the role card used, so a card marked held there is
+        // held here too.
+        const status = statusForSkill(card.name, skills);
         const match = card.matches_skill.trim();
-        const held = match.length > 0 && skillNames.has(match.toLowerCase());
+        const held =
+          status !== "to collect" ||
+          (match.length > 0 && skillNames.has(match.toLowerCase()));
         const resourceSeen = lenient.has(normaliseUrl(card.resource_url));
         return {
           name: card.name,

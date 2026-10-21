@@ -16,6 +16,7 @@ import type {
   LevelUpStory,
   LevelUpSummary,
   Opportunity,
+  SkillBadge,
   Skill,
   SkillsPayload,
   TaskChoice,
@@ -77,6 +78,10 @@ export function usePlayfulFlow() {
   const [searching, setSearching] = useState(false);
   const [searchNote, setSearchNote] = useState(SEARCH_NOTES[0]);
   const [savedExample, setSavedExample] = useState(false);
+
+  /** One story per role, fetched on demand and kept for the session. */
+  const [roleStories, setRoleStories] = useState<Record<string, LevelUpStory | null>>({});
+  const roleStoriesLoading = useRef<Set<string>>(new Set());
 
   /* Step 4b */
   const [levelUp, setLevelUp] = useState<LevelUp | null>(null);
@@ -259,6 +264,28 @@ export function usePlayfulFlow() {
     });
   }, [confirmedSkills, isExample, lightsUp, opportunities, runSearch, tasks, whereIComeFrom]);
 
+  const loadRoleStory = useCallback(
+    async (roleTitle: string) => {
+      const key = roleTitle.trim();
+      if (!key || key in roleStories || roleStoriesLoading.current.has(key)) return;
+      roleStoriesLoading.current.add(key);
+      try {
+        const payload = await postJson<{ story: LevelUpStory | null }>("/api/role-video", {
+          roleTitle: key,
+          isExample,
+        });
+        setRoleStories((current) => ({ ...current, [key]: payload.story }));
+      } catch {
+        // A missing story is not an error the person needs to see: the card
+        // simply shows without one.
+        setRoleStories((current) => ({ ...current, [key]: null }));
+      } finally {
+        roleStoriesLoading.current.delete(key);
+      }
+    },
+    [isExample, roleStories],
+  );
+
   const openLevelUp = useCallback(
     async (opportunity: Opportunity, from: Stage) => {
       setLevelUpReturn(from);
@@ -278,6 +305,7 @@ export function usePlayfulFlow() {
           opportunityType: opportunity.type,
           whyYou: opportunity.why_you,
           skills: confirmedSkills,
+          badges: opportunity.skills as SkillBadge[],
         });
         const next: LevelUp = {
           opportunityTitle: opportunity.title,
@@ -423,6 +451,7 @@ export function usePlayfulFlow() {
     setLevelUp(null);
     setLevelUps([]);
     setLevelUpReturn("opportunities");
+    setRoleStories({});
   }, []);
 
   const retrySkills = useCallback(() => {
@@ -467,6 +496,9 @@ export function usePlayfulFlow() {
     reactToOpportunity,
     surpriseMe,
     finish,
+
+    roleStories,
+    loadRoleStory,
 
     levelUp,
     openLevelUp,

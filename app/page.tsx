@@ -61,6 +61,8 @@ export default function Home() {
         searching={flow.searching}
         searchNote={flow.searchNote}
         savedExample={flow.savedExample}
+        roleStories={flow.roleStories}
+        onLoadRoleStory={flow.loadRoleStory}
         error={flow.error}
         onReact={flow.reactToOpportunity}
         onSurprise={flow.surpriseMe}

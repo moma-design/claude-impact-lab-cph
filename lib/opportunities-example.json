@@ -1,64 +1,196 @@
 {
   "opportunities": [
     {
-      "title": "Senior clinical pharmacist in a primary care network, focused on older people and care homes",
+      "title": "Consultant Pharmacist in Antimicrobial Stewardship",
+      "skills": [
+        {
+          "name": "Rapid clinical risk judgement",
+          "status": "hidden"
+        },
+        {
+          "name": "Cross-professional influencing",
+          "status": "hidden"
+        },
+        {
+          "name": "Teaching and mentoring",
+          "status": "held"
+        },
+        {
+          "name": "Service leadership and strategy",
+          "status": "to collect"
+        },
+        {
+          "name": "Research and audit leadership",
+          "status": "to collect"
+        }
+      ],
       "type": "opening",
-      "why_you": "Your five years in Care of the Elderly and your medicines reconciliation skill suit complex polypharmacy reviews. You would also keep making the escalation calls you want to hold on to.",
-      "skill_to_add": "General practice clinic and caseload management",
-      "learning_resource_title": "",
-      "learning_resource_url": "",
-      "source_title": "PCN Senior Clinical Pharmacist",
-      "source_url": "https://www.jobs.nhs.uk/candidate/jobadvert/A5388-26-0004"
-    },
-    {
-      "title": "Clinical safety officer for digital health systems",
-      "type": "emerging role",
-      "why_you": "Your rapid clinical risk judgement and your work on medicines safety incident reviews are the core of clinical risk management for software. As a pharmacist you are a registered clinician, which the role requires.",
-      "skill_to_add": "Digital clinical risk standards (DCB0129 and DCB0160)",
-      "learning_resource_title": "Clinical Safety Officer Practitioner Training",
-      "learning_resource_url": "https://digi-safe.uk/clinical-safety-officer-practitioner-training/",
-      "source_title": "Clinical Safety Officer (CSO) services for the NHS",
-      "source_url": "https://digi-safe.uk/clinical-safety-officer"
-    },
-    {
-      "title": "Sessional pharmacist teacher of prescribing for medical students",
-      "type": "polywork",
-      "why_you": "You already teach new junior doctors every four months and have a practised way of bringing newcomers up to speed. A medical school could use that, alongside your ward post.",
-      "skill_to_add": "Designing and assessing teaching sessions",
-      "learning_resource_title": "",
-      "learning_resource_url": "",
-      "source_title": "Pharmacist Peer-Led Teaching Enhances Medical Undergraduate Prescribing: A Mixed-Methods Study",
-      "source_url": "https://pubmed.ncbi.nlm.nih.gov/40926548/"
-    },
-    {
-      "title": "Pharmacist-led deprescribing in care homes",
-      "type": "new field",
-      "why_you": "Your understanding of polypharmacy and frailty, plus your experience persuading doctors without authority over them, is what deprescribing in care homes depends on. It also gives you variety and clear patient impact.",
-      "skill_to_add": "Structured deprescribing for frail older people",
-      "learning_resource_title": "Patient-Centered Deprescribing in Older Adults",
-      "learning_resource_url": "https://www.pharmacist.com/Education/Certificate-Training-Programs/Patient-Centered-Deprescribing-in-Older-Adults",
-      "source_title": "Enhancing deprescribing: A qualitative understanding of the complexities of pharmacist-led deprescribing in care homes",
-      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10100492"
-    },
-    {
-      "title": "Medicines safety reviewer for AI tools in pharmacy",
-      "type": "emerging role",
-      "why_you": "Because you would hand reconciliation to AI, your rapid risk judgement and incident review experience are what is needed to spot where such tools fail. You would also teach colleagues to use them safely.",
-      "skill_to_add": "Evaluating AI tool safety",
-      "learning_resource_title": "Essentials of Digital Clinical Safety",
-      "learning_resource_url": "https://portal.e-lfh.org.uk/Component/Details/746703",
-      "source_title": "FIP STATEMENT OF POLICY Artificial intelligence in pharmacy practice",
-      "source_url": "https://www.fip.org/file/6354"
-    },
-    {
-      "title": "Split week: acute hospital pharmacy plus advanced practice in general practice",
-      "type": "polywork",
-      "why_you": "Your acute risk judgement and your teaching would transfer to general practice, while the hospital sessions keep your acute skills current. The mix gives you the variety and learning you value.",
-      "skill_to_add": "Advanced practice credentialing",
+      "why_you": "Your reputation for antimicrobial stewardship, plus your habit of persuading doctors without authority over them (cross-professional influencing), is what a consultant post leans on. Your teaching of juniors fits the education strand.",
+      "skill_to_add": "Consultant-level service leadership",
       "learning_resource_title": "RCPharm advanced credentialing support programme",
       "learning_resource_url": "https://www.cppe.ac.uk/career/rps-adv-credential",
-      "source_title": "Role of advanced practice pharmacists in general practice",
-      "source_url": "https://wchh.onlinelibrary.wiley.com/doi/10.1002/psb.1961"
+      "source_title": "Consultant Pharmacist Antimicrobial Stewardship",
+      "source_url": "https://www.jobs.nhs.uk/candidate/jobadvert/C9184-24-2333"
+    },
+    {
+      "title": "Pharmacist with a portfolio career: clinical, teaching and project work",
+      "skills": [
+        {
+          "name": "Teaching and mentoring",
+          "status": "held"
+        },
+        {
+          "name": "Medicines reconciliation",
+          "status": "held"
+        },
+        {
+          "name": "Repeated onboarding of newcomers",
+          "status": "hidden"
+        },
+        {
+          "name": "Managing several employers",
+          "status": "to collect"
+        },
+        {
+          "name": "Pitching your own services",
+          "status": "to collect"
+        }
+      ],
+      "type": "polywork",
+      "why_you": "Variety is one of your three drivers. Your confirmed teaching and mentoring and your practised way of onboarding newcomers every four months could become a paid strand beside your ward work.",
+      "skill_to_add": "Pitching your own services",
+      "learning_resource_title": "",
+      "learning_resource_url": "",
+      "source_title": "How a portfolio career like mine could give the pharmacy workforce a boost",
+      "source_url": "https://pharmaceutical-journal.com/article/opinion/how-a-portfolio-career-like-mine-could-give-the-pharmacy-workforce-a-boost"
+    },
+    {
+      "title": "Credentialed advanced pharmacist practitioner",
+      "skills": [
+        {
+          "name": "Rapid clinical risk judgement",
+          "status": "hidden"
+        },
+        {
+          "name": "Care of older patients",
+          "status": "hidden"
+        },
+        {
+          "name": "Medicines reconciliation",
+          "status": "held"
+        },
+        {
+          "name": "Portfolio evidence of advanced practice",
+          "status": "to collect"
+        },
+        {
+          "name": "Clinical examination skills",
+          "status": "to collect"
+        }
+      ],
+      "type": "emerging role",
+      "why_you": "Your quick risk judgement in acute medicine and your years in Care of the Elderly are the kind of evidence an advanced practice portfolio asks for. The Pharmaceutical Journal reports that pharmacists are now being credentialed through an e-portfolio system.",
+      "skill_to_add": "Advanced practice portfolio building",
+      "learning_resource_title": "RCPharm advanced credentialing support programme",
+      "learning_resource_url": "https://www.cppe.ac.uk/career/rps-adv-credential",
+      "source_title": "First pharmacists credentialed as advanced practitioners under new e-portfolio system",
+      "source_url": "https://pharmaceutical-journal.com/article/news/first-pharmacists-credentialed-as-advanced-practitioners-under-new-e-portfolio-system"
+    },
+    {
+      "title": "Part-week deprescribing pharmacist for care homes",
+      "skills": [
+        {
+          "name": "Care of older patients",
+          "status": "hidden"
+        },
+        {
+          "name": "Medicines reconciliation",
+          "status": "held"
+        },
+        {
+          "name": "Cross-professional influencing",
+          "status": "hidden"
+        },
+        {
+          "name": "Independent prescribing in care settings",
+          "status": "to collect"
+        },
+        {
+          "name": "Working with care home staff",
+          "status": "to collect"
+        }
+      ],
+      "type": "fractional",
+      "why_you": "Your five years in Care of the Elderly give you a feel for polypharmacy and frailty, and your influencing of senior colleagues carries over to GPs and care home teams. Research on pharmacist independent prescribers in UK care homes looks at the role and what affects how much deprescribing they do.",
+      "skill_to_add": "Independent prescribing in care homes",
+      "learning_resource_title": "",
+      "learning_resource_url": "",
+      "source_title": "Pharmacist-independent prescriber deprescribing in UK care homes: Contextual factors associated with increased activity",
+      "source_url": "https://bpspubs.onlinelibrary.wiley.com/doi/10.1111/bcp.15643"
+    },
+    {
+      "title": "Pharmacy clinical informatics and decision support",
+      "skills": [
+        {
+          "name": "Rapid clinical risk judgement",
+          "status": "hidden"
+        },
+        {
+          "name": "Medicines reconciliation",
+          "status": "held"
+        },
+        {
+          "name": "Cross-professional influencing",
+          "status": "hidden"
+        },
+        {
+          "name": "Clinical decision support design",
+          "status": "to collect"
+        },
+        {
+          "name": "Health data basics",
+          "status": "to collect"
+        }
+      ],
+      "type": "new field",
+      "why_you": "You see where prescribing goes wrong at the bedside, and that is what a safer electronic system needs from a clinician. Your influencing skills help when you have to persuade doctors to accept an alert or a new workflow.",
+      "skill_to_add": "Clinical decision support design",
+      "learning_resource_title": "",
+      "learning_resource_url": "",
+      "source_title": "Pharmacy Informatics and Its Cross-Functional Role in Healthcare",
+      "source_url": "https://www.himss.org/resources/pharmacy-informatics-and-its-cross-functional-role-healthcare/"
+    },
+    {
+      "title": "Clinical pharmacist working alongside AI medicines safety tools",
+      "skills": [
+        {
+          "name": "Rapid clinical risk judgement",
+          "status": "hidden"
+        },
+        {
+          "name": "Medicines reconciliation",
+          "status": "held"
+        },
+        {
+          "name": "Teaching and mentoring",
+          "status": "held"
+        },
+        {
+          "name": "Checking AI outputs critically",
+          "status": "to collect"
+        },
+        {
+          "name": "Evaluating new technology",
+          "status": "to collect"
+        }
+      ],
+      "type": "emerging role",
+      "why_you": "You want to hand over reconciliation and incident review but keep the escalation decisions. This role is about doing exactly that, with your rapid risk judgement as the check on what the tools produce. A published review looks at how AI is changing clinical and hospital pharmacy.",
+      "skill_to_add": "Checking AI outputs critically",
+      "learning_resource_title": "",
+      "learning_resource_url": "",
+      "source_title": "Impact of Artificial Intelligence on the Future of Clinical Pharmacy and Hospital Pharmacy",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12560970/"
     }
   ]
 }

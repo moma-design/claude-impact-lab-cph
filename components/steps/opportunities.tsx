@@ -1,8 +1,16 @@
 "use client";
 
-import { APP_NAME } from "@/lib/app-config";
-import { OPPORTUNITY_TYPE_LABELS, type Opportunity } from "@/lib/flow/types";
+import { useEffect } from "react";
 
+import { APP_NAME } from "@/lib/app-config";
+import {
+  OPPORTUNITY_TYPE_LABELS,
+  SKILL_BADGE_LABELS,
+  type LevelUpStory,
+  type Opportunity,
+} from "@/lib/flow/types";
+
+import { Story } from "./story";
 import { ErrorNote, Eyebrow, primaryButton, quietLink, secondaryButton, Thinking } from "../ui";
 
 interface OpportunitiesProps {
@@ -13,6 +21,9 @@ interface OpportunitiesProps {
   searchNote: string;
   savedExample: boolean;
   error: string | null;
+  /** Cached per role title. undefined means not fetched yet, null means none. */
+  roleStories: Record<string, LevelUpStory | null>;
+  onLoadRoleStory: (roleTitle: string) => void;
   onReact: (reaction: "interested" | "not-for-me") => void;
   onSurprise: () => void;
   onFinish: () => void;
@@ -26,11 +37,22 @@ export function Opportunities({
   searchNote,
   savedExample,
   error,
+  roleStories,
+  onLoadRoleStory,
   onReact,
   onSurprise,
   onFinish,
 }: OpportunitiesProps) {
   const card = opportunities[index];
+  const cardTitle = card?.title;
+
+  // The story is fetched when the card is shown, not up front, so the deck
+  // stays fast. The hook caches it per role for the session.
+  useEffect(() => {
+    if (cardTitle) onLoadRoleStory(cardTitle);
+  }, [cardTitle, onLoadRoleStory]);
+
+  const story = cardTitle ? roleStories[cardTitle] : undefined;
   const deckDone = !searching && opportunities.length > 0 && index >= opportunities.length;
 
   return (
@@ -78,6 +100,21 @@ export function Opportunities({
             {card.title}
           </h2>
 
+          {(card.skills ?? []).length > 0 ? (
+            <ul className="mt-5 flex flex-wrap gap-2">
+              {(card.skills ?? []).map((skill) => (
+                <li
+                  key={skill.name}
+                  className="rounded-full border border-line px-4 py-2 text-[14px] text-ink"
+                  data-status={skill.status}
+                >
+                  {skill.name}{" "}
+                  <span className="text-muted">{SKILL_BADGE_LABELS[skill.status]}</span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
           <p className="mt-5 text-[17px] leading-relaxed text-ink">
             <span className="font-medium">Why you. </span>
             {card.why_you}
@@ -118,6 +155,25 @@ export function Opportunities({
               No source link for this one, so treat it as a direction rather than a listing.
             </p>
           )}
+
+          <div className="mt-5 border-t border-line pt-4">
+            <p className="text-[13px] font-medium text-ink">
+              Meet professionals in this role
+            </p>
+            {story === undefined ? (
+              <div className="mt-3">
+                <Thinking label="Looking for someone who does this" />
+              </div>
+            ) : story === null ? (
+              <p className="mt-2 text-[15px] leading-relaxed text-muted">
+                Nothing published turned up for this one.
+              </p>
+            ) : (
+              <div className="mt-3">
+                <Story story={story} />
+              </div>
+            )}
+          </div>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <button

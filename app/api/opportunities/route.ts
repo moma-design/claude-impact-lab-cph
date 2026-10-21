@@ -7,6 +7,7 @@ import {
   opportunitiesUserPrompt,
 } from "@/lib/server/flow-prompts";
 import { collectSourceUrls, extractJson, normaliseUrl, WEB_SEARCH_TOOL } from "@/lib/server/search";
+import { statusForSkill } from "@/lib/server/skill-status";
 import savedExample from "@/lib/opportunities-example.json";
 
 export const runtime = "nodejs";
@@ -127,6 +128,15 @@ export async function POST(request: Request) {
         const learningSeen = sources.has(normaliseUrl(item.learning_resource_url));
         return {
           ...item,
+          // Status is never taken on trust: it is recomputed from the skills
+          // the person actually confirmed, so the card and Level up agree.
+          skills: item.skills
+            .filter((skill) => skill.name.trim())
+            .slice(0, 6)
+            .map((skill) => ({
+              name: skill.name.trim(),
+              status: statusForSkill(skill.name, skills),
+            })),
           // A link that was not in the search results is removed, never shown.
           source_url: sourceSeen ? item.source_url : "",
           source_title: sourceSeen

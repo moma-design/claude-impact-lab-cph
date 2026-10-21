@@ -36,8 +36,29 @@ export const OPPORTUNITY_TYPES = [
   "new field",
 ] as const;
 
+export const SKILL_BADGE_STATUSES = ["held", "hidden", "to collect"] as const;
+export type SkillBadgeStatus = (typeof SKILL_BADGE_STATUSES)[number];
+
+export const SKILL_BADGE_LABELS: Record<SkillBadgeStatus, string> = {
+  held: "Held",
+  hidden: "Hidden",
+  "to collect": "To collect",
+};
+
+export interface SkillBadge {
+  name: string;
+  status: SkillBadgeStatus;
+}
+
 export const OpportunitySchema = z.object({
   title: z.string(),
+  /** Four to six skills the role needs. Status is decided server-side. */
+  skills: z.array(
+    z.object({
+      name: z.string(),
+      status: z.enum(SKILL_BADGE_STATUSES),
+    }),
+  ),
   type: z.enum(OPPORTUNITY_TYPES),
   why_you: z.string(),
   skill_to_add: z.string(),

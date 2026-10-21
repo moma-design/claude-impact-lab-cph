@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-
 import { APP_NAME } from "@/lib/app-config";
-import type { LevelUp, LevelUpStory } from "@/lib/flow/types";
+import type { LevelUp } from "@/lib/flow/types";
+
+import { Story } from "./story";
 
 import { ErrorNote, Eyebrow, primaryButton, quietLink, secondaryButton, Thinking } from "../ui";
 
@@ -14,67 +14,6 @@ interface LevelUpScreenProps {
   error: string | null;
   onCollect: (cardName: string) => void;
   onBack: () => void;
-}
-
-/**
- * Nothing from YouTube or Vimeo loads until the person taps Play: the iframe
- * is only created on that tap, and the embed host is the no-cookie one.
- */
-function Story({ story }: { story: LevelUpStory }) {
-  const [playing, setPlaying] = useState(false);
-
-  return (
-    <li className="rounded-xl border border-line bg-surface p-6">
-      <p className="text-[13px] font-medium text-accent">
-        {story.kind === "video"
-          ? "Video"
-          : story.kind === "community"
-            ? "Community"
-            : "Story"}
-      </p>
-      <h3 className="mt-2 text-[19px] leading-snug font-semibold text-ink">{story.title}</h3>
-
-      {story.embed_url ? (
-        playing ? (
-          <div className="mt-4">
-            <iframe
-              src={`${story.embed_url}?autoplay=1`}
-              title={story.title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
-              allowFullScreen
-              className="aspect-video w-full rounded-lg border border-line"
-            />
-          </div>
-        ) : (
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={() => setPlaying(true)}
-              className={primaryButton}
-            >
-              Play
-            </button>
-          </div>
-        )
-      ) : null}
-
-      <p className="mt-4 text-[15px] leading-relaxed text-ink">
-        <span className="font-medium">Why watch this. </span>
-        {story.why_watch}
-      </p>
-
-      <p className="mt-3 text-[14px]">
-        <a
-          href={story.source_url}
-          target="_blank"
-          rel="noreferrer"
-          className="text-accent underline underline-offset-4 hover:text-ink"
-        >
-          Open the original
-        </a>
-      </p>
-    </li>
-  );
 }
 
 export function LevelUpScreen({
@@ -194,7 +133,12 @@ export function LevelUpScreen({
             </h2>
             <ul className="mt-6 grid gap-4 sm:grid-cols-2">
               {levelUp.stories.map((story) => (
-                <Story key={story.source_url} story={story} />
+                <li
+                  key={story.source_url}
+                  className="rounded-xl border border-line bg-surface p-6"
+                >
+                  <Story story={story} />
+                </li>
               ))}
               {levelUp.stories.length === 0 ? (
                 <li className="text-[15px] leading-relaxed text-muted">
