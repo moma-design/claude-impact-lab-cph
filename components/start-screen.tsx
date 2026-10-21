@@ -1,16 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 
-import {
-  MAX_PDF_BYTES,
-  SUPPORTING_LINE,
-  TAGLINE,
-  type Profile,
-} from "@/lib/app-config";
+import { MAX_PDF_BYTES, SUPPORTING_LINE, type Profile } from "@/lib/app-config";
 import { EXAMPLE_PERSON_NAME } from "@/lib/example-person";
 
-import { ErrorNote, primaryButton, quietLink } from "./ui";
+import { StartScene } from "./start-scene";
+import { ErrorNote, quietLink } from "./ui";
 
 interface StartScreenProps {
   onStart: (profile: Profile) => void;
@@ -34,7 +30,6 @@ export function StartScreen({ onStart, onExample, busy, error }: StartScreenProp
   const [file, setFile] = useState<File | null>(null);
   const [pastedText, setPastedText] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
-  const fileInput = useRef<HTMLInputElement>(null);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -61,81 +56,113 @@ export function StartScreen({ onStart, onExample, busy, error }: StartScreenProp
   const shownError = localError ?? error;
 
   return (
-    <main className="relative mx-auto w-full max-w-[680px] px-6 py-16 sm:py-24">
+    <div className="start-wrap">
+      <main>
+        <h1 className="display text-[clamp(42px,5vw,68px)] leading-[0.94]">
+          The world
+          <br />
+          is yours.
+        </h1>
+        <p className="mt-5 mb-7 max-w-[52ch] text-[14px] leading-[1.6] text-ink">
+          {SUPPORTING_LINE}
+        </p>
 
-      <h1 className="display mt-6 text-[44px] sm:text-[64px]">
-        The world
-        <br />
-        is yours.
-      </h1>
-      <p className="strap mt-6 max-w-[34ch] text-ink">{TAGLINE}</p>
-      <p className="mt-5 max-w-[60ch] text-[14px] leading-relaxed text-muted">
-        {SUPPORTING_LINE}
-      </p>
-
-      <form onSubmit={handleSubmit} className="mt-12 space-y-10">
-        <div className="border-t border-dashed border-line pt-10">
-          <label htmlFor="linkedin-pdf" className="label block">
-            Your LinkedIn profile, as a PDF
-          </label>
-          <p id="linkedin-pdf-help" className="mt-2 text-[14px] leading-relaxed text-muted">
+        <form onSubmit={handleSubmit} className="paper-card rounded-[4px] p-6">
+          <div className="mb-3.5 flex items-baseline gap-3">
+            <span aria-hidden="true" className="step-num">
+              01
+            </span>
+            <span className="label text-ink" id="pdf-label">
+              Your LinkedIn profile
+            </span>
+          </div>
+          <p id="pdf-help" className="-mt-1.5 mb-3.5 text-[13px] leading-[1.5] text-muted">
             On your LinkedIn profile, click Resources, then Save to PDF.
           </p>
-          <input
-            ref={fileInput}
-            id="linkedin-pdf"
-            name="linkedin-pdf"
-            type="file"
-            accept="application/pdf,.pdf"
-            aria-describedby="linkedin-pdf-help"
-            onChange={(event) => {
-              setFile(event.target.files?.[0] ?? null);
-              setLocalError(null);
-            }}
-            className="paper-card mt-4 block w-full cursor-pointer rounded-[4px] p-3 text-[14px] text-muted file:mr-4 file:cursor-pointer file:rounded-[3px] file:border-0 file:bg-ink file:px-4 file:py-2 file:text-[12px] file:font-bold file:tracking-[0.12em] file:text-canvas file:uppercase"
-          />
-        </div>
 
-        <div>
-          <label htmlFor="profile-text" className="label block">
-            Or paste your profile text
+          <label className="drop">
+            <span aria-hidden="true" className="drop-icon">
+              PDF
+            </span>
+            <span>
+              <b className="block text-[14px]">
+                {file ? file.name : "Choose your profile PDF"}
+              </b>
+              <span className="text-[13px] text-muted">
+                {file ? "Ready to go" : "Or drop it here"}
+              </span>
+            </span>
+            <input
+              type="file"
+              accept="application/pdf,.pdf"
+              aria-labelledby="pdf-label"
+              aria-describedby="pdf-help"
+              onChange={(event) => {
+                setFile(event.target.files?.[0] ?? null);
+                setLocalError(null);
+              }}
+              className="hidden"
+            />
           </label>
-          <p id="profile-text-help" className="mt-2 text-[14px] leading-relaxed text-muted">
-            Headline, about, roles and skills is plenty.
+
+          <details className="mt-3.5">
+            <summary className="label cursor-pointer text-ink">
+              Or paste your profile text
+            </summary>
+            <textarea
+              aria-label="Your profile text"
+              value={pastedText}
+              onChange={(event) => {
+                setPastedText(event.target.value);
+                setLocalError(null);
+              }}
+              className="mt-3 min-h-[120px] w-full resize-y rounded-[4px] border border-ink/25 bg-white p-3 text-[13px] leading-[1.55] text-ink placeholder:text-muted"
+              placeholder="Senior clinical pharmacist, acute medicine. Nineteen years in hospital pharmacy..."
+            />
+          </details>
+
+          <div className="divide" />
+
+          <div className="mb-3.5 flex items-baseline gap-3">
+            <span aria-hidden="true" className="step-num">
+              02
+            </span>
+            <span className="label text-ink">Start</span>
+          </div>
+          <p className="-mt-1.5 text-[13px] leading-[1.5] text-muted">
+            Claude reads it, then shows you what it sees.
           </p>
-          <textarea
-            id="profile-text"
-            name="profile-text"
-            rows={6}
-            value={pastedText}
-            aria-describedby="profile-text-help"
-            onChange={(event) => {
-              setPastedText(event.target.value);
-              setLocalError(null);
-            }}
-            className="paper-card mt-4 w-full resize-y rounded-[4px] p-4 text-[14px] leading-relaxed text-ink placeholder:text-muted"
-            placeholder="Senior clinical pharmacist, acute medicine. Nineteen years in hospital pharmacy..."
-          />
-        </div>
 
-        {shownError ? <ErrorNote message={shownError} /> : null}
+          {shownError ? (
+            <div className="mt-4">
+              <ErrorNote message={shownError} />
+            </div>
+          ) : null}
 
-        <div className="flex flex-col gap-5">
-          <button type="submit" className={primaryButton} disabled={busy}>
-            {busy ? "Starting" : "Start"}
+          <button type="submit" className="go" disabled={busy}>
+            <span>{busy ? "Starting" : "Start"}</span>
+            <span aria-hidden="true" className="arrow">
+              →
+            </span>
           </button>
-          <p className="text-[12px] tracking-[0.1em] text-muted uppercase">Nothing is saved.</p>
-        </div>
-      </form>
 
-      <div className="mt-12 border-t border-dashed border-line pt-8">
-        <button type="button" onClick={onExample} className={quietLink} disabled={busy}>
-          Try with an example person
-        </button>
-        <p className="mt-3 text-[14px] leading-relaxed text-muted">
-          {EXAMPLE_PERSON_NAME}. A fictional profile, written for this demo.
+          <p className="mt-3 text-[12px] tracking-[0.06em] text-muted uppercase">
+            Nothing is saved.
+          </p>
+        </form>
+
+        <p className="mt-6 text-[13px] leading-[1.6] text-ink">
+          <button type="button" onClick={onExample} className={quietLink} disabled={busy}>
+            Try with an example person
+          </button>
+          <br />
+          <span className="text-muted">
+            {EXAMPLE_PERSON_NAME}. A fictional profile, written for this demo.
+          </span>
         </p>
-      </div>
-    </main>
+      </main>
+
+      <StartScene />
+    </div>
   );
 }

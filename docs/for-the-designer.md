@@ -208,3 +208,22 @@ Smallest change that clears AA, listed so you can argue with any of them.
 
 Contrast, measured on his ground: ink on canvas 15.6:1, muted on canvas 7.0:1, amber on
 ink 14.4:1, ink on pink 7.1:1, ink on yellow 14.5:1.
+
+## Where we kept Marie's decision over the mockup
+
+Martin, these four are deliberate, not oversights. The start page follows your
+`1c3159d` layout in every other respect: the two columns, the numbered sections, the
+dashed divider, the drop zone, the collapsible paste, the yellow-on-black button with
+its arrow, and the scene with YOU inside the sun and the three labelled rings.
+
+1. **The input stays a PDF upload plus paste.** Your page takes a `linkedin.com/in/`
+   URL. The app cannot read a profile from a link, so a URL field would promise
+   something it cannot do. The sections are renumbered to 01 and 02 as a result.
+2. **No feeling score.** The 1 to 10 scale is out of the app entirely, so your sun no
+   longer changes with it. It is fixed at a mid warmth and breathes as in your file.
+3. **No visible brand badge.** "The Dream Job Configurator" is the browser tab title
+   only. The visible headline is "The world is yours."
+4. **The button reads "Start", not "Start the conversation"**, and the fine print does
+   not promise five questions, because the five typed questions are not in the flow.
+
+The lede is the current product line, not the one in your file, for the same reason.
