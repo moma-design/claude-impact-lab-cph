@@ -71,11 +71,12 @@ export function SignalsPanel({ flowMarkdown, isExample }: SignalsPanelProps) {
         </div>
       ) : (
         <>
-          <p className="mt-6 text-[13px] font-medium text-accent">
-            {savedExample
-              ? "Saved example. A real result kept from an earlier run, shown because the live check did not return."
-              : "Signals, not forecasts. Sources shown."}
-          </p>
+          {savedExample ? (
+            <p className="mt-6 max-w-[62ch] text-[13px] font-medium text-accent">
+              Saved example. A real result kept from an earlier run, shown because the
+              live check did not return.
+            </p>
+          ) : null}
           <ol className="mt-6 space-y-6">
             {signals.map((signal, index) => (
               <li

@@ -118,8 +118,10 @@ export function Results({
         <p className="mt-4 max-w-[68ch] text-[17px] leading-relaxed text-ink">
           {map.step_this_week.action}
         </p>
-        <p className="mt-3 text-[15px] text-muted">
-          About {map.step_this_week.minutes}. Talk to {map.step_this_week.who_to_talk_to}.
+        <p className="mt-4 text-[15px] text-muted">About {map.step_this_week.minutes}.</p>
+        <p className="mt-1 text-[15px] text-muted">
+          <span className="font-medium text-ink">Who to talk to. </span>
+          {map.step_this_week.who_to_talk_to}
         </p>
       </section>
 
