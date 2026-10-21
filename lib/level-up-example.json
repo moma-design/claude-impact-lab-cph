@@ -1,0 +1,176 @@
+{
+  "decks": [
+    {
+      "opportunity_title": "Senior clinical pharmacist in a primary care network, focused on older people and care homes",
+      "role_title": "Senior primary care clinical pharmacist, care homes",
+      "cards": [
+        {
+          "name": "Polypharmacy medication review",
+          "held": true,
+          "matches_skill": "Older patient medicines expertise",
+          "how_to_earn": "Show it by walking through how you would run a structured review for one complex anonymised older patient, then compare your steps with the CPPE page.",
+          "resource_title": "Fundamentals of structured medication review : CPPE",
+          "resource_url": "https://www.cppe.ac.uk/programmes/l/medrev-ec-02/"
+        },
+        {
+          "name": "Deprescribing in frailty",
+          "held": false,
+          "matches_skill": "",
+          "how_to_earn": "Take the STOPP/START version 3 paper and apply five criteria to a recent older patient's drug chart, noting what you would stop or start.",
+          "resource_title": "STOPP/START criteria for potentially inappropriate prescribing in older people: version 3 - PMC",
+          "resource_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10447584/"
+        },
+        {
+          "name": "Medicines reconciliation",
+          "held": true,
+          "matches_skill": "Medicines reconciliation",
+          "how_to_earn": "Show it with a short example of a discrepancy you caught on admission and how you resolved it against the GP record.",
+          "resource_title": "",
+          "resource_url": ""
+        },
+        {
+          "name": "Antimicrobial stewardship",
+          "held": true,
+          "matches_skill": "Antimicrobial stewardship",
+          "how_to_earn": "Show it by outlining how you would adapt your ward approach to care home prescribing, such as urinary tract infection treatment.",
+          "resource_title": "",
+          "resource_url": ""
+        },
+        {
+          "name": "Clinical governance",
+          "held": true,
+          "matches_skill": "Clinical governance",
+          "how_to_earn": "Show it by describing an audit or incident review you led and how you would repeat it across several care homes.",
+          "resource_title": "",
+          "resource_url": ""
+        },
+        {
+          "name": "Independent prescribing readiness",
+          "held": false,
+          "matches_skill": "",
+          "how_to_earn": "Read the CPPE page on preparing to train and list which requirements you already meet and which you need to evidence.",
+          "resource_title": "Preparing to train as an independent prescriber : CPPE",
+          "resource_url": "https://www.cppe.ac.uk/career/preparingtotrainip"
+        },
+        {
+          "name": "Care home team communication",
+          "held": true,
+          "matches_skill": "Clinical communication under pressure",
+          "how_to_earn": "Show it by drafting a short, tactful message to a care home manager recommending a medicine change.",
+          "resource_title": "",
+          "resource_url": ""
+        },
+        {
+          "name": "Primary care role progression",
+          "held": false,
+          "matches_skill": "",
+          "how_to_earn": "Skim the pathway handbook and note where a senior post sits and which capabilities it expects.",
+          "resource_title": "Primary care pharmacy education pathway Pathway and role progression handbook",
+          "resource_url": "https://www.cppe.ac.uk/learningdocuments/pdfs/pcpep/pcpep%20pathway%20and%20role%20progression%20handbook.pdf"
+        }
+      ],
+      "stories": [
+        {
+          "kind": "article",
+          "title": "Pharmacist in practice: \u2018What attracts me to the PCN world is the variety it offers\u2019 - The Pharmacist",
+          "why_watch": "A PCN pharmacist describes the day to day variety of the role, which helps you judge whether it suits you.",
+          "source_url": "https://www.thepharmacist.co.uk/in-practice/interviews-in-practice/pharmacist-in-practice-what-attracts-me-to-the-pcn-world-is-the-variety-it-offers/",
+          "embed_url": ""
+        },
+        {
+          "kind": "article",
+          "title": "051 Ryan Smith: A jack of all trades - Primary Care Network (PCN) Pharmacist, Clinical Director for MORPh Consultancy, and Clinical Director for The Pharmacist Network by Pharmacist Diaries",
+          "why_watch": "A podcast conversation showing how a PCN pharmacist career can widen into leadership and consultancy.",
+          "source_url": "https://creators.spotify.com/pod/profile/pharmacistdiaries/episodes/051-Ryan-Smith-A-jack-of-all-trades---Primary-Care-Network-PCN-Pharmacist--Clinical-Director-for-MORPh-Consultancy--and-Clinical-Director-for-The-Pharmacist-Network-e19onn3",
+          "embed_url": ""
+        }
+      ]
+    },
+    {
+      "opportunity_title": "Medicines safety reviewer for AI tools in pharmacy",
+      "role_title": "Medicines safety reviewer for AI",
+      "cards": [
+        {
+          "name": "Reconciling medicines with AI",
+          "held": true,
+          "matches_skill": "Medicines reconciliation",
+          "how_to_earn": "Pick one recent reconciliation you did and describe, in a few lines, the exact points where you would not trust an automated list without checking.",
+          "resource_title": "",
+          "resource_url": ""
+        },
+        {
+          "name": "Spotting AI dosing errors",
+          "held": false,
+          "matches_skill": "",
+          "how_to_earn": "Read the abstract on hallucinated dosing, then ask a general AI tool a dosing question you know well and note whether it gets the detail right.",
+          "resource_title": "Hallucinated dosing: An emerging medication safety risk in generative AI",
+          "resource_url": "https://academic.oup.com/ajhp/advance-article-abstract/doi/10.1093/ajhp/zxag177/8703655?redirectedFrom=fulltext"
+        },
+        {
+          "name": "Challenging AI prescribing suggestions",
+          "held": true,
+          "matches_skill": "Prescribing decision support",
+          "how_to_earn": "Take three prescriptions junior doctors recently brought you and write the one question you would put to an AI tool's suggestion for each.",
+          "resource_title": "",
+          "resource_url": ""
+        },
+        {
+          "name": "Clinical safety standards knowledge",
+          "held": false,
+          "matches_skill": "",
+          "how_to_earn": "Read a plain English guide to DCB0160 and note which of its steps look like incident reviews you already do.",
+          "resource_title": "DCB0160 Guide: Clinical Risk Management Standard for GP Practices",
+          "resource_url": "https://protectclinical.co.uk/articles/a-plain-english-guide-to-dcb0160-for-busy-practice-managers"
+        },
+        {
+          "name": "Clinical safety officer duties",
+          "held": false,
+          "matches_skill": "",
+          "how_to_earn": "Read what a clinical safety officer does and list two duties you could already evidence from your ward work.",
+          "resource_title": "What Is a Clinical Safety Officer? Role, Requirements & How to Appoint One",
+          "resource_url": "https://protectclinical.co.uk/articles/what-is-a-clinical-safety-officer"
+        },
+        {
+          "name": "Governing AI tool risk",
+          "held": true,
+          "matches_skill": "Clinical governance",
+          "how_to_earn": "Show how you would take an AI tool's near miss through your usual governance route, from report to learning, in a one page outline.",
+          "resource_title": "What is DCB0160? Understanding Clinical Safety Standards",
+          "resource_url": "https://8foldgovernance.com/what-is-dcb0160-clinical-safety-standards-for-health-care-providers/"
+        },
+        {
+          "name": "Benchmarking AI against pharmacists",
+          "held": false,
+          "matches_skill": "",
+          "how_to_earn": "Skim the introduction and results of this benchmarking study and note what kinds of prescription review errors the models made compared with pharmacists.",
+          "resource_title": "Human-Level and Beyond: Benchmarking Large Language Models Against Clinical Pharmacists in Prescription Review",
+          "resource_url": "https://arxiv.org/pdf/2512.02024"
+        },
+        {
+          "name": "Teaching colleagues safe AI use",
+          "held": true,
+          "matches_skill": "Induction and onboarding design",
+          "how_to_earn": "Adapt your intake induction into a one page outline of what a new user must check before relying on an AI tool.",
+          "resource_title": "",
+          "resource_url": ""
+        }
+      ],
+      "stories": [
+        {
+          "kind": "video",
+          "title": "AI in Pharmacy: What's Next? - YouTube",
+          "why_watch": "A pharmacy focused look at where AI is heading, so you can hear the opportunities and concerns in practitioners' own terms.",
+          "source_url": "https://www.youtube.com/watch?v=7PIE7LmkElA",
+          "embed_url": "https://www.youtube-nocookie.com/embed/7PIE7LmkElA"
+        },
+        {
+          "kind": "video",
+          "title": "Pharmacists Seek AI-Driven Solutions To Address Medication Errors - YouTube",
+          "why_watch": "Shows how pharmacists are framing AI as a way to reduce medication errors, which is the safety question you would be reviewing.",
+          "source_url": "https://www.youtube.com/watch?v=mLGcYA5HV8U",
+          "embed_url": "https://www.youtube-nocookie.com/embed/mLGcYA5HV8U"
+        }
+      ]
+    }
+  ]
+}

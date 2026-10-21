@@ -13,6 +13,8 @@ export const runtime = "nodejs";
 export const maxDuration = 300;
 
 const MAX_PAUSE_RESUMES = 3;
+/** Below this many verified cards, unsourced ones are kept to fill the deck. */
+const MIN_DECK = 4;
 
 interface OpportunitiesRequest {
   whereIComeFrom?: string;
@@ -47,6 +49,7 @@ export async function POST(request: Request) {
 
   const surprise = Boolean(body.surprise);
   const count = surprise ? 3 : 6;
+  const asked = surprise ? 4 : 8;
   const alreadyShown = body.alreadyShown ?? [];
 
   const fallback = (message: string, status: number) => {
@@ -77,7 +80,7 @@ export async function POST(request: Request) {
           flowMarkdown,
           alreadyShown,
           surprise,
-          count,
+          count: asked,
         }),
       },
     ];
@@ -116,25 +119,42 @@ export async function POST(request: Request) {
     }
 
     const seen = new Set(alreadyShown.map((title) => title.toLowerCase()));
-    const opportunities = parsed.data.opportunities
-      // Keep only cards whose source really appeared in the search results.
-      .filter((item) => sources.has(normaliseUrl(item.source_url)))
+    const candidates = parsed.data.opportunities
+      .filter((item) => item.title.trim() && item.why_you.trim())
       .filter((item) => !seen.has(item.title.trim().toLowerCase()))
-      .map((item) => ({
-        ...item,
-        source_title: item.source_title || sources.get(normaliseUrl(item.source_url))!,
-        // A learning link that was not in the results is dropped, not invented.
-        learning_resource_url: sources.has(normaliseUrl(item.learning_resource_url))
-          ? item.learning_resource_url
-          : "",
-        learning_resource_title: sources.has(normaliseUrl(item.learning_resource_url))
-          ? item.learning_resource_title
-          : "",
-      }))
-      .slice(0, count);
+      .map((item) => {
+        const sourceSeen = sources.has(normaliseUrl(item.source_url));
+        const learningSeen = sources.has(normaliseUrl(item.learning_resource_url));
+        return {
+          ...item,
+          // A link that was not in the search results is removed, never shown.
+          source_url: sourceSeen ? item.source_url : "",
+          source_title: sourceSeen
+            ? item.source_title || sources.get(normaliseUrl(item.source_url))!
+            : "",
+          learning_resource_url: learningSeen ? item.learning_resource_url : "",
+          learning_resource_title: learningSeen ? item.learning_resource_title : "",
+        };
+      });
 
-    if (opportunities.length === 0) {
-      return fallback("Nothing came back with a source that checks out.", 502);
+    // Cards with a verified source come first. An unsourced card is kept only
+    // to reach a usable deck, and then with its link stripped rather than
+    // shown, so nothing unverified is ever presented as a source.
+    const sourced = candidates.filter((item) => item.source_url);
+    const unsourced = candidates.filter((item) => !item.source_url);
+    const opportunities = (
+      sourced.length >= MIN_DECK ? sourced : [...sourced, ...unsourced]
+    ).slice(0, count);
+
+    console.log(
+      `opportunities: ${parsed.data.opportunities.length} returned, ${sourced.length} sourced, ${opportunities.length} shown`,
+    );
+
+    // A thin live run would demo badly, so the example person falls back to
+    // the saved deck rather than a single card.
+    const tooThin = !surprise && opportunities.length < MIN_DECK;
+    if (opportunities.length === 0 || (tooThin && body.isExample)) {
+      return fallback("Nothing came back that stands up.", 502);
     }
 
     return Response.json({ opportunities, savedExample: false });

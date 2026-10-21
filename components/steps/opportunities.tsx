@@ -102,16 +102,22 @@ export function Opportunities({
             ) : null}
           </div>
 
-          <p className="mt-5 text-[14px]">
-            <a
-              href={card.source_url}
-              target="_blank"
-              rel="noreferrer"
-              className="text-accent underline underline-offset-4 hover:text-ink"
-            >
-              {card.source_title}
-            </a>
-          </p>
+          {card.source_url ? (
+            <p className="mt-5 text-[14px]">
+              <a
+                href={card.source_url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-accent underline underline-offset-4 hover:text-ink"
+              >
+                {card.source_title}
+              </a>
+            </p>
+          ) : (
+            <p className="mt-5 text-[14px] text-muted">
+              No source link for this one, so treat it as a direction rather than a listing.
+            </p>
+          )}
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <button

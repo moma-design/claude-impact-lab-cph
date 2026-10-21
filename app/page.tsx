@@ -1,6 +1,7 @@
 "use client";
 
 import { StartScreen } from "@/components/start-screen";
+import { LevelUpScreen } from "@/components/steps/level-up";
 import { LightsUp } from "@/components/steps/lights-up";
 import { Opportunities } from "@/components/steps/opportunities";
 import { SkillCards } from "@/components/steps/skill-cards";
@@ -68,6 +69,19 @@ export default function Home() {
     );
   }
 
+  if (flow.stage === "levelUp") {
+    return (
+      <LevelUpScreen
+        levelUp={flow.levelUp}
+        searching={flow.searching}
+        searchNote={flow.searchNote}
+        error={flow.error}
+        onCollect={flow.collectCard}
+        onBack={flow.closeLevelUp}
+      />
+    );
+  }
+
   return (
     <YourFlow
       flow={flow.flow}
@@ -80,6 +94,7 @@ export default function Home() {
       error={flow.error}
       onFeelingNow={flow.setFeelingNow}
       onFindNew={flow.findNewOpportunities}
+      onLevelUp={(opportunity) => flow.openLevelUp(opportunity, "flow")}
       onRestart={flow.restart}
     />
   );

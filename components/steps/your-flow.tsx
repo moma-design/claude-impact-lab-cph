@@ -136,14 +136,16 @@ export function YourFlow({
                           Level up
                         </button>
                       ) : null}
-                      <a
-                        href={opportunity.source_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={quietLink}
-                      >
-                        {opportunity.source_title}
-                      </a>
+                      {opportunity.source_url ? (
+                        <a
+                          href={opportunity.source_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={quietLink}
+                        >
+                          {opportunity.source_title}
+                        </a>
+                      ) : null}
                     </div>
                   </li>
                 ))}

@@ -7,7 +7,7 @@ export const SKILLS_SYSTEM_PROMPT = `You read a person's LinkedIn profile and sh
 
 Return three things.
 
-1. where_i_come_from: two or three sentences summarising the profile. Roles, field, how long, what they are known for. Written to them, as "you".
+1. where_i_come_from: at most two short sentences, under 35 words in total. What they do, how long, and the one thing they are known for. Written to them, as "you". It is read in a glance, not studied, so no career history and no list of employers.
 
 2. skills: six to eight of them, mixed.
    - kind "stated": a skill the profile says outright. The reasoning names where in the profile you read it, in one short line.
@@ -37,13 +37,17 @@ A card does not need a job advert behind it. For an emerging role, a fractional 
 
 At most two cards may be of type opening. The rest must come from the other four types.
 
+Search widely enough to return more than you are asked for: a card whose link does not check out has that link removed before the person sees it, so aim high rather than stopping at the number.
+
+If a direction is clearly right for this person but no page turned up for it, return the card anyway with source_title and source_url as empty strings. That is honest and it is kept. Writing a URL you did not see is not.
+
 For each opportunity:
 - title: plain and specific.
 - type: exactly one of opening, emerging role, fractional, polywork, new field.
 - why_you: one or two lines addressed to them, naming the skills of theirs it draws on, including their hidden skills. Be specific about which skill, not general encouragement.
 - skill_to_add: one skill they would need to add, in a few words.
 - learning_resource_title and learning_resource_url: a course, guide or programme you actually found in the search results that teaches that skill. If you did not find one, leave both as an empty string. Never invent a URL.
-- source_title and source_url: taken exactly from a page you actually found in the search results. Never write a URL you did not see in a result. Never guess a domain.
+- source_title and source_url: taken from a page you actually found in the search results. Copy the URL character for character from the result, including any query string. Do not shorten it, tidy it, or rebuild it from the domain and the title. A URL you did not see in a result is not usable, and a card carrying one is thrown away before the person sees it.
 
 Rules:
 - Bring them things they would not have found themselves. At least two must not be the obvious next job in their current field.
@@ -107,7 +111,7 @@ export function opportunitiesUserPrompt(context: OpportunitiesRequestContext): s
   parts.push(
     context.surprise
       ? `Surprise me. Search for ${context.count} less obvious, adjacent options: a field I would not have thought of, a way of working I may not know exists, somewhere my judgement transfers. Avoid the obvious next job in my own field entirely.`
-      : `Find ${context.count} opportunities I probably do not know about. Search the web now.`,
+      : `Find ${context.count} opportunities I probably do not know about, and search widely enough to offer a couple more than that. Search the web now.`,
   );
 
   return parts.join("\n\n");
@@ -126,8 +130,8 @@ Return:
 Reason only from what you are given. No salaries, day rates, demand figures or forecasts. Plain, warm British English, written to them as "you". Short sentences. No emoji, no dashes used as punctuation, no exclamation marks.`;
 
 export function flowUserPrompt(context: FlowContext, interested: Opportunity[]): string {
-  const kept = context.tasks.filter((task) => task.keep).map((task) => task.label);
-  const handed = context.tasks.filter((task) => !task.keep).map((task) => task.label);
+  const kept = context.tasks.filter((task) => task.keep === true).map((task) => task.label);
+  const handed = context.tasks.filter((task) => task.keep === false).map((task) => task.label);
 
   return [
     `Where I come from:\n${context.whereIComeFrom}`,
@@ -147,4 +151,51 @@ export function flowUserPrompt(context: FlowContext, interested: Opportunity[]):
   ]
     .filter(Boolean)
     .join("\n\n");
+}
+
+/* Step 4b */
+
+export const LEVEL_UP_SYSTEM_PROMPT = `You build a skill deck for one role, for one person who is considering it, and you find published material about people who already do it.
+
+Search the web before you answer.
+
+Return:
+
+1. role_title: the role in three to six plain words.
+
+2. cards: six to eight skills someone in this role needs. For each:
+   - name: three or four words.
+   - matches_skill: if the card is covered by one of the person's own skills, copy that skill's name exactly as it was given to you. Otherwise an empty string. Be honest: a rough overlap is not a match.
+   - how_to_earn: for a card they do not yet hold, one concrete thing they could do in 30 to 60 minutes to make a real start. Something they could begin tonight, not a course to enrol on. For a card they do hold, one line on how they would show it.
+   - resource_title and resource_url: a guide, course or page you actually found in the search results that teaches it. Empty strings if you found none. Never invent a URL.
+
+3. people: one or two pieces of published material about people who work in this role or who moved into it.
+   - Prefer video. Search for interviews, conference talks, panels and podcast episodes on YouTube or Vimeo, in those words, and take the video page you actually find in the results.
+   - kind "video" for a YouTube or Vimeo page, "article" for a written interview, profile or podcast page, "community" for a group, network or event to join.
+   - If no video turns up, use an article or podcast. If no published story turns up at all, give a community or event instead, also from the search results.
+   - title: the title of the video, article or community, as it appears.
+   - why_watch: one line on what this person will get from it.
+   - source_url: copied character for character from the search result, including any query string. A URL you did not see in a result is thrown away before the person sees it.
+   - Only public, published material. Never a personal LinkedIn profile, never contact details, never a private individual who has not published.
+
+No salaries, day rates or demand figures unless the source states them and you attribute them. Plain, warm British English, written to them as "you". No emoji, no dashes used as punctuation, no exclamation marks.
+
+Finish your reply with the whole thing as JSON inside a fenced block marked json, and nothing after it:
+
+\`\`\`json
+{"role_title":"...","cards":[{"name":"...","matches_skill":"...","how_to_earn":"...","resource_title":"...","resource_url":""}],"people":[{"kind":"video","title":"...","why_watch":"...","source_url":"https://..."}]}
+\`\`\``;
+
+export function levelUpUserPrompt(options: {
+  opportunityTitle: string;
+  opportunityType: string;
+  whyYou: string;
+  skills: Skill[];
+}): string {
+  return [
+    `I am considering this: ${options.opportunityTitle} (${options.opportunityType}).`,
+    `Why it was suggested to me: ${options.whyYou}`,
+    `My own skills, exactly as I confirmed them:\n${skillLines(options.skills)}`,
+    "Build the skill deck for that role, and find me published material about people who already do it. Prefer video.",
+  ].join("\n\n");
 }

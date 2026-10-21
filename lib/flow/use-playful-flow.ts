@@ -11,13 +11,17 @@ import { MAX_LIGHTS_UP } from "./lights-up";
 import type {
   FlowContext,
   FlowPayload,
+  LevelUp,
+  LevelUpCard,
+  LevelUpStory,
+  LevelUpSummary,
   Opportunity,
   Skill,
   SkillsPayload,
   TaskChoice,
 } from "./types";
 
-export type Stage = "start" | "skills" | "lights" | "opportunities" | "flow";
+export type Stage = "start" | "skills" | "lights" | "opportunities" | "levelUp" | "flow";
 
 const GENERIC_ERROR = "Something went wrong. Try again.";
 const UNREACHABLE = "Could not reach the server. Is the dev server still running?";
@@ -74,6 +78,11 @@ export function usePlayfulFlow() {
   const [searchNote, setSearchNote] = useState(SEARCH_NOTES[0]);
   const [savedExample, setSavedExample] = useState(false);
 
+  /* Step 4b */
+  const [levelUp, setLevelUp] = useState<LevelUp | null>(null);
+  const [levelUpReturn, setLevelUpReturn] = useState<Stage>("opportunities");
+  const [levelUps, setLevelUps] = useState<LevelUpSummary[]>([]);
+
   /* Step 5 */
   const [flow, setFlow] = useState<FlowPayload | null>(null);
   const [flowMarkdown, setFlowMarkdown] = useState("");
@@ -116,8 +125,8 @@ export function usePlayfulFlow() {
           skills: options.skills,
           extraSkill: extraSkill.trim() || undefined,
           lightsUp: options.picks,
-          keeps: options.taskChoices?.filter((t) => t.keep).map((t) => t.label),
-          handsOver: options.taskChoices?.filter((t) => !t.keep).map((t) => t.label),
+          keeps: options.taskChoices?.filter((t) => t.keep === true).map((t) => t.label),
+          handsOver: options.taskChoices?.filter((t) => t.keep === false).map((t) => t.label),
           flowMarkdown: options.flowMarkdown,
           alreadyShown: options.shown,
         });
@@ -144,7 +153,7 @@ export function usePlayfulFlow() {
       });
       setWhereIComeFrom(payload.where_i_come_from);
       setProposedSkills(payload.skills);
-      setTasks(payload.tasks.map((label) => ({ label, keep: true })));
+      setTasks(payload.tasks.map((label) => ({ label, keep: null })));
       setSkillIndex(0);
       setConfirmedSkills([]);
     } catch (cause) {
@@ -237,18 +246,6 @@ export function usePlayfulFlow() {
     whereIComeFrom,
   ]);
 
-  const reactToOpportunity = useCallback(
-    (reaction: "interested" | "not-for-me") => {
-      const opportunity = opportunities[opportunityIndex];
-      if (!opportunity) return;
-      if (reaction === "interested") {
-        setInterested((current) => [...current, opportunity]);
-      }
-      setOpportunityIndex((current) => current + 1);
-    },
-    [opportunities, opportunityIndex],
-  );
-
   const surpriseMe = useCallback(() => {
     void runSearch({
       surprise: true,
@@ -262,6 +259,89 @@ export function usePlayfulFlow() {
     });
   }, [confirmedSkills, isExample, lightsUp, opportunities, runSearch, tasks, whereIComeFrom]);
 
+  const openLevelUp = useCallback(
+    async (opportunity: Opportunity, from: Stage) => {
+      setLevelUpReturn(from);
+      setStage("levelUp");
+      setLevelUp(null);
+      setSearching(true);
+      setError(null);
+      try {
+        const payload = await postJson<{
+          role_title: string;
+          cards: LevelUpCard[];
+          stories: LevelUpStory[];
+          savedExample: boolean;
+        }>("/api/level-up", {
+          isExample,
+          opportunityTitle: opportunity.title,
+          opportunityType: opportunity.type,
+          whyYou: opportunity.why_you,
+          skills: confirmedSkills,
+        });
+        const next: LevelUp = {
+          opportunityTitle: opportunity.title,
+          roleTitle: payload.role_title || opportunity.title,
+          cards: payload.cards,
+          stories: payload.stories,
+          savedExample: payload.savedExample,
+          collecting: [],
+        };
+        setLevelUp(next);
+        setLevelUps((current) => [
+          ...current.filter((item) => item.opportunityTitle !== opportunity.title),
+          {
+            roleTitle: next.roleTitle,
+            opportunityTitle: next.opportunityTitle,
+            held: next.cards.filter((card) => card.held).map((card) => card.name),
+            toCollect: next.cards.filter((card) => !card.held).map((card) => card.name),
+            plan: [],
+          },
+        ]);
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : UNREACHABLE);
+      } finally {
+        setSearching(false);
+      }
+    },
+    [confirmedSkills, isExample],
+  );
+
+  const collectCard = useCallback((cardName: string) => {
+    setLevelUp((current) => {
+      if (!current) return current;
+      const collecting = current.collecting.includes(cardName)
+        ? current.collecting.filter((name) => name !== cardName)
+        : [...current.collecting, cardName];
+      setLevelUps((roles) =>
+        roles.map((role) =>
+          role.opportunityTitle === current.opportunityTitle
+            ? { ...role, plan: collecting }
+            : role,
+        ),
+      );
+      return { ...current, collecting };
+    });
+  }, []);
+
+  const closeLevelUp = useCallback(() => {
+    setError(null);
+    setStage(levelUpReturn);
+  }, [levelUpReturn]);
+
+  const reactToOpportunity = useCallback(
+    (reaction: "interested" | "not-for-me") => {
+      const opportunity = opportunities[opportunityIndex];
+      if (!opportunity) return;
+      setOpportunityIndex((current) => current + 1);
+      if (reaction === "interested") {
+        setInterested((current) => [...current, opportunity]);
+        void openLevelUp(opportunity, "opportunities");
+      }
+    },
+    [opportunities, opportunityIndex, openLevelUp],
+  );
+
   const buildContext = useCallback(
     (): FlowContext => ({
       whereIComeFrom,
@@ -270,8 +350,9 @@ export function usePlayfulFlow() {
       lightsUp,
       tasks,
       interested,
+      levelUps,
     }),
-    [confirmedSkills, extraSkill, interested, lightsUp, tasks, whereIComeFrom],
+    [confirmedSkills, extraSkill, interested, levelUps, lightsUp, tasks, whereIComeFrom],
   );
 
   const finish = useCallback(async () => {
@@ -339,6 +420,9 @@ export function usePlayfulFlow() {
     setSavedExample(false);
     setFlow(null);
     setFlowMarkdown("");
+    setLevelUp(null);
+    setLevelUps([]);
+    setLevelUpReturn("opportunities");
   }, []);
 
   const retrySkills = useCallback(() => {
@@ -383,6 +467,11 @@ export function usePlayfulFlow() {
     reactToOpportunity,
     surpriseMe,
     finish,
+
+    levelUp,
+    openLevelUp,
+    collectCard,
+    closeLevelUp,
 
     flow,
     flowMarkdown,

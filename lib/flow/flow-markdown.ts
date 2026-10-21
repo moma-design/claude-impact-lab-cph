@@ -15,8 +15,8 @@ function list(lines: string[]): string {
 export function buildFlowMarkdown(context: FlowContext, flow: FlowPayload): string {
   const confirmed = context.confirmedSkills.filter((skill) => skill.kind === "stated");
   const hidden = context.confirmedSkills.filter((skill) => skill.kind === "hidden");
-  const kept = context.tasks.filter((task) => task.keep).map((task) => task.label);
-  const handed = context.tasks.filter((task) => !task.keep).map((task) => task.label);
+  const kept = context.tasks.filter((task) => task.keep === true).map((task) => task.label);
+  const handed = context.tasks.filter((task) => task.keep === false).map((task) => task.label);
 
   const extra = context.extraSkill.trim()
     ? `\n- ${context.extraSkill.trim()} (added by me)`
@@ -37,6 +37,20 @@ export function buildFlowMarkdown(context: FlowContext, flow: FlowPayload): stri
           )
           .join("\n\n")
       : "Nothing marked interested yet.";
+
+  const levelUps =
+    context.levelUps.length > 0
+      ? context.levelUps
+          .map(
+            (role) =>
+              `### ${role.roleTitle}\n\n` +
+              `From: ${role.opportunityTitle}\n\n` +
+              `Cards I hold (${role.held.length} of ${role.held.length + role.toCollect.length}):\n${list(role.held)}\n\n` +
+              `Cards to collect:\n${list(role.toCollect)}\n\n` +
+              `My plan:\n${list(role.plan)}`,
+          )
+          .join("\n\n")
+      : "Nothing yet.";
 
   return `# My flow
 
@@ -71,6 +85,10 @@ ${list(handed)}
 ## Opportunities I'm interested in
 
 ${opportunities}
+
+## Roles I'm levelling up to
+
+${levelUps}
 
 ## This week's step
 

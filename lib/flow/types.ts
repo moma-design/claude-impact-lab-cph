@@ -83,8 +83,8 @@ export type Reaction = "interested" | "not-for-me";
 
 export interface TaskChoice {
   label: string;
-  /** true when the person keeps it, false when they hand it to AI. */
-  keep: boolean;
+  /** true when the person keeps it, false when they hand it to AI, null until they decide. */
+  keep: boolean | null;
 }
 
 export interface FlowContext {
@@ -94,4 +94,72 @@ export interface FlowContext {
   lightsUp: string[];
   tasks: TaskChoice[];
   interested: Opportunity[];
+  levelUps: LevelUpSummary[];
+}
+
+/** What flow.md records for each role the person opened Level up on. */
+export interface LevelUpSummary {
+  roleTitle: string;
+  opportunityTitle: string;
+  held: string[];
+  toCollect: string[];
+  plan: string[];
+}
+
+/* Step 4b: level up */
+
+export const PERSON_KINDS = ["video", "article", "community"] as const;
+
+export const LevelUpSchema = z.object({
+  role_title: z.string(),
+  cards: z.array(
+    z.object({
+      name: z.string(),
+      /** The person's own skill this card matches, or an empty string. */
+      matches_skill: z.string(),
+      how_to_earn: z.string(),
+      resource_title: z.string(),
+      resource_url: z.string(),
+    }),
+  ),
+  people: z.array(
+    z.object({
+      kind: z.enum(PERSON_KINDS),
+      title: z.string(),
+      why_watch: z.string(),
+      source_url: z.string(),
+    }),
+  ),
+});
+
+export type LevelUpPayload = z.infer<typeof LevelUpSchema>;
+export type PersonKind = (typeof PERSON_KINDS)[number];
+
+/** A card after the server has decided whether the person already holds it. */
+export interface LevelUpCard {
+  name: string;
+  held: boolean;
+  matches_skill: string;
+  how_to_earn: string;
+  resource_title: string;
+  resource_url: string;
+}
+
+export interface LevelUpStory {
+  kind: PersonKind;
+  title: string;
+  why_watch: string;
+  source_url: string;
+  /** Set when the source is a YouTube or Vimeo page found in the results. */
+  embed_url: string;
+}
+
+export interface LevelUp {
+  opportunityTitle: string;
+  roleTitle: string;
+  cards: LevelUpCard[];
+  stories: LevelUpStory[];
+  savedExample: boolean;
+  /** Card names the person tapped "I'll collect this" on. */
+  collecting: string[];
 }

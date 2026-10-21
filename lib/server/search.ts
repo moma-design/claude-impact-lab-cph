@@ -38,3 +38,25 @@ export const WEB_SEARCH_TOOL = {
   name: "web_search",
   max_uses: 8,
 } as const satisfies Anthropic.ToolUnion;
+
+/**
+ * Strict key: keeps the query string, because for a YouTube watch URL the
+ * video id lives there. Used where the exact page matters, such as a video.
+ */
+export function strictUrlKey(url: string): string {
+  return url.trim().replace(/#.*$/, "").replace(/\/+$/, "").toLowerCase();
+}
+
+export function collectStrictUrls(content: Anthropic.ContentBlock[]): Set<string> {
+  const found = new Set<string>();
+  for (const block of content) {
+    if (block.type !== "web_search_tool_result") continue;
+    if (!Array.isArray(block.content)) continue;
+    for (const result of block.content) {
+      if (result.type === "web_search_result" && result.url) {
+        found.add(strictUrlKey(result.url));
+      }
+    }
+  }
+  return found;
+}
