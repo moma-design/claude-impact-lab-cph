@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Depth results</title>
+<html><head><meta charset="utf-8"><title>The Dream Job Configurator</title>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing:border-box; }
@@ -31,6 +31,7 @@
   .signal { background:#fbf8f1; border-left:3px solid #151313; }
 
   .head { position:fixed; left:32px; top:26px; z-index:6; pointer-events:none; transition:opacity .4s; }
+  .head .brand { display:inline-block; font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; background:#151313; color:#f1ece2; padding:5px 10px; border-radius:3px; margin-bottom:14px; }
   .head .h { font-family:Anton, Impact, sans-serif; font-size:clamp(40px,5.2vw,72px); line-height:.92; text-transform:uppercase; }
   .head .m { font-size:12px; text-transform:uppercase; letter-spacing:.04em; margin-top:12px; max-width:34ch; line-height:1.5; }
   .nav { position:fixed; right:28px; top:50%; transform:translateY(-50%); z-index:6; display:flex; flex-direction:column; gap:10px; }
@@ -58,7 +59,7 @@
 <body>
 <div class="dots"></div>
 <div class="stage"><div class="world" id="world"></div></div>
-<div class="head" id="head"><div class="h">The world<br>is yours.</div><div class="m">Scroll into it. What's close, what's in reach, and what's coming.</div></div>
+<div class="head" id="head"><div class="brand">The Dream Job Configurator</div><div class="h">The world<br>is yours.</div><div class="m">Scroll into it. What's close, what's in reach, and what's coming.</div></div>
 <div class="nav" id="nav"></div>
 <div class="hint" id="hint">Scroll ↓ to go deeper</div>
 <div class="scrim" id="scrim"></div>
