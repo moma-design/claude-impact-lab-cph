@@ -92,12 +92,9 @@ export default function Home() {
       worldItems={flow.worldItems}
       heldCount={flow.heldCount}
       toCollectCount={flow.toCollectCount}
-      feelingBefore={flow.feelingBefore}
-      feelingNow={flow.feelingNow}
       isExample={flow.isExample}
       busy={flow.busy}
       error={flow.error}
-      onFeelingNow={flow.setFeelingNow}
       onFindNew={flow.findNewOpportunities}
       onLevelUp={(opportunity) => flow.openLevelUp(opportunity, "flow")}
       onRestart={flow.restart}

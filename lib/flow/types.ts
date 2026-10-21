@@ -61,6 +61,8 @@ export const OpportunitySchema = z.object({
   ),
   type: z.enum(OPPORTUNITY_TYPES),
   why_you: z.string(),
+  /** The fuller version, shown only in the glass panel. */
+  why_you_long: z.string(),
   skill_to_add: z.string(),
   learning_resource_title: z.string(),
   learning_resource_url: z.string(),

@@ -2,12 +2,7 @@ import { QUESTIONS, QUESTION_COUNT } from "@/lib/app-config";
 
 const numberedQuestions = QUESTIONS.map((q, i) => `${i + 1}. ${q}`).join("\n");
 
-export function interviewSystemPrompt(feeling: number | null): string {
-  const feelingSection =
-    feeling === null
-      ? ""
-      : `\n\nBefore starting they rated how they feel about AI and their work as ${feeling} out of 10, where 1 is worried and 10 is excited. Do not mention the number. Let it shape your tone only.`;
-
+export function interviewSystemPrompt(): string {
   return `You are talking to someone about their working life. They have given you their LinkedIn profile. Your job is to find out what the profile does not show, so a career map can be built from it afterwards.
 
 Open your first message with one line that shows you have read the profile, starting with "From your profile:" and naming what they do and roughly how long they have done it. Then ask question 1 in the same message.
@@ -29,7 +24,7 @@ Progress marker, required on every message:
 End every message with a marker on its own line.
 - While asking: [[q=N]] where N is the number of the question you have just asked, from 1 to ${QUESTION_COUNT}.
 - On the closing message, after question ${QUESTION_COUNT} is answered: [[q=done]]
-Write nothing after the marker.${feelingSection}`;
+Write nothing after the marker.`;
 }
 
 export const MAP_SYSTEM_PROMPT = `You read a person's LinkedIn profile and a short conversation about what the profile does not show, and you build their results page and the raw material for a file they keep, called flow.md.

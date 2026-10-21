@@ -263,8 +263,10 @@ body {
   mix-blend-mode: multiply;
 }
 
+/* His tint is .25 with a blur. The blur does not land reliably over the
+   transformed stage, so the tint is raised until the card behind recedes. */
 .scrim {
-  background: rgba(241, 236, 226, 0.25);
+  background: rgba(241, 236, 226, 0.78);
   backdrop-filter: blur(10px) saturate(1.2);
   -webkit-backdrop-filter: blur(10px) saturate(1.2);
 }

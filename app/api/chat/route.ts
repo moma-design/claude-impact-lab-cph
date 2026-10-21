@@ -11,7 +11,6 @@ export const maxDuration = 120;
 interface ChatRequest {
   messages?: ChatMessage[];
   profile?: Profile | null;
-  feeling?: number | null;
 }
 
 export async function POST(request: Request) {
@@ -45,7 +44,7 @@ export async function POST(request: Request) {
       model: MODEL,
       max_tokens: 1024,
       output_config: { effort: "low" },
-      system: interviewSystemPrompt(body.feeling ?? null),
+      system: interviewSystemPrompt(),
       messages: [opening, ...history],
     });
 

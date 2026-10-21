@@ -5,11 +5,22 @@ import { useEffect, useRef } from "react";
 import type { WorldItem } from "@/lib/flow/world";
 
 /** His frosted detail panel, opened by clicking a card on a ring. */
+export interface PanelContent {
+  kind: string;
+  title: string;
+  paragraphs: string[];
+  links?: { label: string; href: string }[];
+}
+
+export function toPanel(item: WorldItem): PanelContent {
+  return { kind: item.kind, title: item.title, paragraphs: [item.body] };
+}
+
 export function DetailPanel({
   item,
   onClose,
 }: {
-  item: WorldItem | null;
+  item: PanelContent | null;
   onClose: () => void;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -54,7 +65,27 @@ export function DetailPanel({
         <h2 id="detail-title" className="display relative my-2.5 mb-3.5 text-[40px] leading-[0.98]">
           {item.title}
         </h2>
-        <p className="relative text-[14px] leading-[1.6] text-ink">{item.body}</p>
+        {item.paragraphs.filter(Boolean).map((paragraph, index) => (
+          <p key={index} className="relative mt-3 text-[14px] leading-[1.6] text-ink first:mt-0">
+            {paragraph}
+          </p>
+        ))}
+        {item.links?.length ? (
+          <ul className="relative mt-5 space-y-2">
+            {item.links.map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[13px] font-bold tracking-[0.08em] text-ink uppercase underline underline-offset-4"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
     </>
   );

@@ -3,10 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { Profile } from "@/lib/app-config";
-import {
-  EXAMPLE_PERSON_FEELING,
-  EXAMPLE_PERSON_PROFILE,
-} from "@/lib/example-person";
+import { EXAMPLE_PERSON_PROFILE } from "@/lib/example-person";
 import { MAX_LIGHTS_UP } from "./lights-up";
 import { buildWorld } from "./world";
 import type {
@@ -58,8 +55,6 @@ export function usePlayfulFlow() {
   const [isExample, setIsExample] = useState(false);
 
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [feelingBefore, setFeelingBefore] = useState<number | null>(null);
-  const [feelingNow, setFeelingNow] = useState<number | null>(null);
 
   /* Step 2 */
   const [whereIComeFrom, setWhereIComeFrom] = useState("");
@@ -178,9 +173,8 @@ export function usePlayfulFlow() {
   }, []);
 
   const start = useCallback(
-    (nextProfile: Profile, nextFeeling: number | null) => {
+    (nextProfile: Profile) => {
       setProfile(nextProfile);
-      setFeelingBefore(nextFeeling);
       setIsExample(false);
       setStage("skills");
       void loadSkills(nextProfile);
@@ -190,7 +184,6 @@ export function usePlayfulFlow() {
 
   const startExample = useCallback(() => {
     setProfile(EXAMPLE_PERSON_PROFILE);
-    setFeelingBefore(EXAMPLE_PERSON_FEELING);
     setIsExample(true);
     setStage("skills");
     void loadSkills(EXAMPLE_PERSON_PROFILE);
@@ -441,8 +434,6 @@ export function usePlayfulFlow() {
     setError(null);
     setIsExample(false);
     setProfile(null);
-    setFeelingBefore(null);
-    setFeelingNow(null);
     setWhereIComeFrom("");
     setProposedSkills([]);
     setSkillIndex(0);
@@ -493,10 +484,6 @@ export function usePlayfulFlow() {
     busy,
     error,
     isExample,
-    feelingBefore,
-    feelingNow,
-    setFeelingNow,
-
     start,
     startExample,
     restart,

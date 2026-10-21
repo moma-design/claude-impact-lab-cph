@@ -7,6 +7,7 @@ import {
   opportunitiesUserPrompt,
 } from "@/lib/server/flow-prompts";
 import { collectSourceUrls, extractJson, normaliseUrl, WEB_SEARCH_TOOL } from "@/lib/server/search";
+import { clampWords } from "@/lib/server/clamp";
 import { statusForSkill } from "@/lib/server/skill-status";
 import savedExample from "@/lib/opportunities-example.json";
 
@@ -128,6 +129,10 @@ export async function POST(request: Request) {
         const learningSeen = sources.has(normaliseUrl(item.learning_resource_url));
         return {
           ...item,
+          // Two lines on the card; the full reasoning lives in the panel.
+          title: clampWords(item.title, 8),
+          why_you: clampWords(item.why_you, 12),
+          why_you_long: item.why_you_long || item.why_you,
           // Status is never taken on trust: it is recomputed from the skills
           // the person actually confirmed, so the card and Level up agree.
           skills: item.skills

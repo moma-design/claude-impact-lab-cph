@@ -3,6 +3,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { buildFlowMarkdown } from "@/lib/flow/flow-markdown";
 import { FlowSchema, type FlowContext } from "@/lib/flow/types";
 import { describeError, getClient, MODEL } from "@/lib/server/claude";
+import { clampChars, clampWords } from "@/lib/server/clamp";
 import { FLOW_SYSTEM_PROMPT, flowUserPrompt } from "@/lib/server/flow-prompts";
 
 export const runtime = "nodejs";
@@ -53,7 +54,19 @@ export async function POST(request: Request) {
       );
     }
 
-    const clean = { ...flow, watching_for: flow.watching_for.filter(Boolean).slice(0, 6) };
+    const clean = {
+      ...flow,
+      watching_for: flow.watching_for.filter(Boolean).slice(0, 6),
+      // Two lines per line, three lines in total, enforced on the data.
+      dream_job: {
+        title: clampWords(flow.dream_job.title, 8),
+        week: flow.dream_job.week.filter(Boolean).slice(0, 3).map((line) => clampChars(line, 110)),
+      },
+      step_this_week: {
+        ...flow.step_this_week,
+        action: clampChars(flow.step_this_week.action, 170),
+      },
+    };
 
     return Response.json({
       flow: clean,

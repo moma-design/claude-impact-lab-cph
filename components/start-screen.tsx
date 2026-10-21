@@ -10,11 +10,10 @@ import {
 } from "@/lib/app-config";
 import { EXAMPLE_PERSON_NAME } from "@/lib/example-person";
 
-import { FeelingScale } from "./feeling-scale";
 import { ErrorNote, primaryButton, quietLink } from "./ui";
 
 interface StartScreenProps {
-  onStart: (profile: Profile, feeling: number | null) => void;
+  onStart: (profile: Profile) => void;
   onExample: () => void;
   busy: boolean;
   error: string | null;
@@ -32,7 +31,6 @@ async function toBase64(file: File): Promise<string> {
 }
 
 export function StartScreen({ onStart, onExample, busy, error }: StartScreenProps) {
-  const [feeling, setFeeling] = useState<number | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [pastedText, setPastedText] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
@@ -48,12 +46,12 @@ export function StartScreen({ onStart, onExample, busy, error }: StartScreenProp
         return;
       }
       const data = await toBase64(file);
-      onStart({ kind: "pdf", name: file.name, data }, feeling);
+      onStart({ kind: "pdf", name: file.name, data });
       return;
     }
 
     if (pastedText.trim().length > 40) {
-      onStart({ kind: "text", text: pastedText }, feeling);
+      onStart({ kind: "text", text: pastedText });
       return;
     }
 
@@ -76,13 +74,6 @@ export function StartScreen({ onStart, onExample, busy, error }: StartScreenProp
       </p>
 
       <form onSubmit={handleSubmit} className="mt-12 space-y-10">
-        <FeelingScale
-          name="feeling-before"
-          legend="How do you feel about AI and your work right now?"
-          value={feeling}
-          onChange={setFeeling}
-        />
-
         <div className="border-t border-dashed border-line pt-10">
           <label htmlFor="linkedin-pdf" className="label block">
             Your LinkedIn profile, as a PDF

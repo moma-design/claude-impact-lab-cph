@@ -64,3 +64,35 @@ export function Story({ story }: { story: LevelUpStory }) {
     </div>
   );
 }
+
+/** The compact form used on the opportunity card: a title line and Play. */
+export function VideoTile({ story }: { story: LevelUpStory }) {
+  const [playing, setPlaying] = useState(false);
+
+  if (playing && story.embed_url) {
+    return (
+      <iframe
+        src={playerUrl(story.embed_url, story.source_url)}
+        title={story.title}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
+        allowFullScreen
+        className="aspect-video w-full rounded-[4px] border border-ink/20"
+      />
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-3">
+      {story.embed_url ? (
+        <button
+          type="button"
+          onClick={() => setPlaying(true)}
+          className="shrink-0 rounded-[3px] bg-ink px-4 py-2 text-[12px] font-bold tracking-[0.12em] text-canvas uppercase"
+        >
+          Play
+        </button>
+      ) : null}
+      <p className="line-clamp-1 text-[14px] text-ink">{story.title}</p>
+    </div>
+  );
+}

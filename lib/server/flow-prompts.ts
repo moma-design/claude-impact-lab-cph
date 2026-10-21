@@ -42,10 +42,11 @@ Search widely enough to return more than you are asked for: a card whose link do
 If a direction is clearly right for this person but no page turned up for it, return the card anyway with source_title and source_url as empty strings. That is honest and it is kept. Writing a URL you did not see is not.
 
 For each opportunity:
-- title: plain and specific.
+- title: the role in four to seven plain words. No subtitle, no clause after a comma. It has to fit two lines on a card.
 - type: exactly one of opening, emerging role, fractional, polywork, new field.
 - skills: four to six skills the role needs, each with a status. Where a skill is one the person already confirmed, copy their skill name exactly as it was given to you and set status "held" for a confirmed skill or "hidden" for one of their hidden skills. For anything they do not yet have, write the skill in three or four words and set status "to collect". At least two should be ones they hold. The status you send is checked against their own list, so copying the name exactly is what makes it count.
-- why_you: one or two lines addressed to them, naming the skills of theirs it draws on, including their hidden skills. Be specific about which skill, not general encouragement.
+- why_you: one sentence of twelve words at most, naming the skill of theirs it draws on. This is the only line on the card, so make it land.
+- why_you_long: two or three sentences with the fuller reasoning, for the panel the person opens if they want it.
 - skill_to_add: one skill they would need to add, in a few words.
 - learning_resource_title and learning_resource_url: a course, guide or programme you actually found in the search results that teaches that skill. If you did not find one, leave both as an empty string. Never invent a URL.
 - source_title and source_url: taken from a page you actually found in the search results. Copy the URL character for character from the result, including any query string. Do not shorten it, tidy it, or rebuild it from the domain and the title. A URL you did not see in a result is not usable, and a card carrying one is thrown away before the person sees it.
@@ -59,7 +60,7 @@ Rules:
 Finish your reply with the opportunities as JSON inside a fenced block marked json, and nothing after it:
 
 \`\`\`json
-{"opportunities":[{"title":"...","type":"opening","skills":[{"name":"...","status":"held"},{"name":"...","status":"hidden"},{"name":"...","status":"to collect"}],"why_you":"...","skill_to_add":"...","learning_resource_title":"...","learning_resource_url":"...","source_title":"...","source_url":"https://..."}]}
+{"opportunities":[{"title":"...","type":"opening","skills":[{"name":"...","status":"held"},{"name":"...","status":"hidden"},{"name":"...","status":"to collect"}],"why_you":"...","why_you_long":"...","skill_to_add":"...","learning_resource_title":"...","learning_resource_url":"...","source_title":"...","source_url":"https://..."}]}
 \`\`\``;
 
 export interface OpportunitiesRequestContext {
@@ -123,8 +124,8 @@ export function opportunitiesUserPrompt(context: OpportunitiesRequestContext): s
 export const FLOW_SYSTEM_PROMPT = `You write the last page of someone's career session: one step for this week, and the raw material for a file they keep.
 
 Return:
-- dream_job: the single role at the centre of all of this, configured from what they confirmed. A title that names the shape as well as the work, for example "Clinical safety lead for health software, three days a week, with teaching on the side". Then week: two or three short lines describing what a week in it looks like. Build it only from their confirmed skills, their picks, and the opportunities they marked as interesting. No employer, no salary, no invented facts.
-- step_this_week: one concrete skill-building action they could do this week in 30 to 60 minutes, tied to an opportunity they marked as interesting, plus how long it takes and the type of person to talk to. Describe the type of person, never a named individual. It has to be something they could start tonight, not a plan.
+- dream_job: the single role at the centre of all of this, configured from what they confirmed. title is the role name in four to seven words and nothing more, for example "Consultant pharmacist, antimicrobial stewardship". Anything else, such as teaching or safety design, belongs in the lines below, not in the title. Then week: at most three lines, each one short sentence of sixteen words at most, describing what a week in it looks like. Build it only from their confirmed skills, their picks, and the opportunities they marked as interesting. No employer, no salary, no invented facts.
+- step_this_week: one concrete skill-building action they could do this week in 30 to 60 minutes, tied to an opportunity they marked as interesting, plus how long it takes and the type of person to talk to. Describe the type of person, never a named individual. It has to be something they could start tonight, not a plan. Keep action to one sentence of twenty-five words at most.
 - what_lights_me_up: two or three sentences in their own terms about what they chose, what they keep and what they would hand over.
 - watching_for: four to six short lines naming what a future search should look for on their behalf. Each is phrased as a search would be: a kind of role, a shift in a field, a practice entering their work, a type of employer. No predictions, no figures.
 - closing_line: one honest, encouraging sentence.

@@ -5,8 +5,7 @@ import { useState } from "react";
 import type { FlowPayload, Opportunity } from "@/lib/flow/types";
 import type { WorldItem } from "@/lib/flow/world";
 
-import { DetailPanel } from "../detail-panel";
-import { FeelingScale } from "../feeling-scale";
+import { DetailPanel, toPanel } from "../detail-panel";
 import { ErrorNote, primaryButton, quietLink, secondaryButton, Thinking } from "../ui";
 import { World } from "../world";
 
@@ -15,14 +14,11 @@ interface YourFlowProps {
   flowMarkdown: string;
   interested: Opportunity[];
   worldItems: WorldItem[];
-  feelingBefore: number | null;
-  feelingNow: number | null;
   isExample: boolean;
   busy: boolean;
   error: string | null;
   heldCount: number;
   toCollectCount: number;
-  onFeelingNow: (value: number) => void;
   onFindNew: () => void;
   onLevelUp?: (opportunity: Opportunity) => void;
   onRestart: () => void;
@@ -33,14 +29,11 @@ export function YourFlow({
   flowMarkdown,
   interested,
   worldItems,
-  feelingBefore,
-  feelingNow,
   isExample,
   busy,
   error,
   heldCount,
   toCollectCount,
-  onFeelingNow,
   onFindNew,
   onLevelUp,
   onRestart,
@@ -144,7 +137,7 @@ export function YourFlow({
         centre={dreamJob}
       />
 
-      <DetailPanel item={open} onClose={() => setOpen(null)} />
+      <DetailPanel item={open ? toPanel(open) : null} onClose={() => setOpen(null)} />
 
       {/* After the rings: the file, the score, and another search. */}
       {showFlow ? (
@@ -217,20 +210,6 @@ export function YourFlow({
               <p className="mt-4 text-[14px] text-muted">
                 Yours to keep. Paste it into any AI tool.
               </p>
-            </section>
-
-            <section className="mt-16 border-t border-dashed border-line pt-10">
-              <FeelingScale
-                name="feeling-after"
-                legend="How do you feel now?"
-                value={feelingNow}
-                onChange={onFeelingNow}
-              />
-              {feelingNow !== null ? (
-                <p className="display mt-8 text-[40px] sm:text-[56px]">
-                  Before {feelingBefore ?? "not said"} · Now {feelingNow}
-                </p>
-              ) : null}
             </section>
 
             <footer className="mt-16 flex flex-wrap items-center gap-6 border-t border-dashed border-line pt-8 no-print">
