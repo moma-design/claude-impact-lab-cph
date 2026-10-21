@@ -35,6 +35,13 @@
   .drop b { display:block; font-size:13px; }
   .drop span { font-size:12px; color:#5b4d4d; }
   .drop input { display:none; }
+  .url { display:flex; align-items:center; border:1.5px solid rgba(21,19,19,.35); border-radius:4px; background:#fff; transition:border-color .2s, box-shadow .2s; }
+  .url:focus-within { border-color:#151313; box-shadow:0 0 0 3px #ffe500; }
+  .url .pre { flex:none; padding:16px 0 16px 16px; font-size:14px; font-weight:700; color:#5b4d4d; }
+  .url input { flex:1; min-width:0; border:0; outline:0; background:none; padding:16px 8px 16px 2px; font:14px "JetBrains Mono", monospace; color:#151313; }
+  .url .ok { flex:none; width:28px; height:28px; margin-right:12px; border-radius:50%; background:#151313; color:#ffe36a; display:flex; align-items:center; justify-content:center; font-size:14px; opacity:0; transform:scale(.6); transition:.25s; }
+  .url.valid .ok { opacity:1; transform:scale(1); }
+  .urlnote { font-size:11px; margin:8px 0 0; min-height:1em; color:#5b4d4d; }
   details { margin-top:14px; }
   summary { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; cursor:pointer; }
   textarea { width:100%; margin-top:12px; min-height:120px; resize:vertical; border:1px solid rgba(21,19,19,.25); border-radius:4px; padding:12px; font:13px/1.55 "JetBrains Mono", monospace; background:#fff; color:#151313; }
@@ -65,7 +72,7 @@
     <h1>Your career, read from what you know.</h1>
     <p class="lede">Rather than your job title. Start with your LinkedIn profile, add the five things it does not show, and leave with a flow.md file of your own and a live read on what is changing.</p>
 
-    <form class="card" onsubmit="event.preventDefault(); location.href = document.querySelector('.example a').href">
+    <form class="card" onsubmit="event.preventDefault(); location.href = document.getElementById('toConvo').href">
       <div class="step"><span class="num">01</span><span class="label" id="feel-label">How do you feel about AI and your work right now?</span></div>
       <fieldset class="scale" aria-labelledby="feel-label" id="scale"></fieldset>
       <div class="ends"><span>1 · worried</span><span id="chosen" aria-live="polite">Nothing chosen yet</span><span>10 · excited</span></div>
@@ -73,17 +80,19 @@
       <div class="divide"></div>
 
       <div class="step"><span class="num">02</span><span class="label">Your LinkedIn profile</span></div>
-      <p class="help">On your LinkedIn profile, click Resources, then Save to PDF.</p>
-      <label class="drop" id="drop">
-        <div class="icon">PDF</div>
-        <div><b id="dropname">Drop your LinkedIn PDF here</b><span>or click to choose a file · max 20 MB</span></div>
-        <input type="file" accept="application/pdf,.pdf" id="file">
+      <p class="help">Paste the link to your profile. Copy it from the address bar on LinkedIn.</p>
+      <label class="url" id="urlbox">
+        <span class="pre">linkedin.com/in/</span>
+        <input type="text" id="url" inputmode="url" autocomplete="url" placeholder="ingrid-dahl" aria-label="Your LinkedIn profile URL">
+        <span class="ok" id="ok" aria-hidden="true">✓</span>
       </label>
+      <p class="urlnote" id="urlnote" aria-live="polite"></p>
       <details>
         <summary>Or paste your profile text</summary>
         <textarea placeholder="Senior clinical pharmacist, acute medicine. Nineteen years in hospital pharmacy..." aria-label="Profile text"></textarea>
       </details>
 
+      <a id="toConvo" href="conversation.html" hidden></a>
       <button class="go" type="submit"><span>Start the conversation</span><span class="arrow">→</span></button>
       <div class="fine"><span>Nothing is saved.</span><span>Then five questions</span></div>
     </form>
@@ -129,13 +138,16 @@ scale.addEventListener('change', e => {
   mood.textContent = v <= 3 ? "Fair enough. Let's find the light." : v <= 7 ? 'Somewhere in between. Good place to start.' : "Let's make the most of it.";
 });
 
-// file drop
-const drop = document.getElementById('drop'), file = document.getElementById('file');
-const setName = f => document.getElementById('dropname').textContent = f ? `✓ ${f.name}` : 'Drop your LinkedIn PDF here';
-file.onchange = () => setName(file.files[0]);
-['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
-['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
-drop.addEventListener('drop', e => setName(e.dataTransfer.files[0]));
+// LinkedIn URL: accept a full link or just the handle
+const url = document.getElementById('url'), urlbox = document.getElementById('urlbox'), urlnote = document.getElementById('urlnote');
+url.addEventListener('input', () => {
+  const v = url.value.trim();
+  const m = v.match(/(?:linkedin\.com\/in\/)?([A-Za-z0-9\-_%]{3,100})\/?$/);
+  const full = v.includes('linkedin.com/in/');
+  if (full) url.value = m ? m[1] : v.replace(/^.*linkedin\.com\/in\//, '');   // keep just the handle; the prefix shows the rest
+  urlbox.classList.toggle('valid', !!m);
+  urlnote.textContent = !v ? '' : m ? `linkedin.com/in/${m[1]}` : 'That does not look like a profile link yet.';
+});
 
 // rings + ripples, same language as the results page
 const NS = 'http://www.w3.org/2000/svg', svg = document.getElementById('rings');
