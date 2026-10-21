@@ -13,6 +13,8 @@ import { LevelNav } from "./ui";
  */
 
 const GAP = 1500;
+/** Cards a ring can hold without crowding at 1280 and above. */
+const PER_RING = 8;
 const RIPPLES = 6;
 
 const TONE_CLASS: Record<WorldItem["tone"], string> = {
@@ -73,6 +75,8 @@ export function World({
   const maxTarget = centre ? GAP * 3 + 400 : GAP * 2 + 400;
 
   // Lay the items out around their ring, with a gap at the top for the label.
+  // A ring shows at most PER_RING cards; the rest sit behind one "+N more"
+  // card that opens the glass panel, so nothing overlaps and every title reads.
   const placed = useMemo(() => {
     const perRing = new Map<number, WorldItem[]>();
     for (const item of items) {
@@ -80,16 +84,34 @@ export function World({
       list.push(item);
       perRing.set(item.ring, list);
     }
-    return items.map((item) => {
-      const siblings = perRing.get(item.ring) ?? [];
+
+    const shown: WorldItem[] = [];
+    for (const [ring, list] of perRing) {
+      if (list.length <= PER_RING) {
+        shown.push(...list);
+        continue;
+      }
+      const overflow = list.slice(PER_RING - 1);
+      shown.push(...list.slice(0, PER_RING - 1), {
+        id: `more:${ring}`,
+        ring,
+        tone: "paper",
+        kind: "Also here",
+        title: `+${overflow.length} more`,
+        body: overflow.map((item) => `${item.kind}: ${item.title}`).join(" · "),
+      });
+    }
+
+    return shown.map((item) => {
+      const siblings = shown.filter((other) => other.ring === item.ring);
       const index = siblings.indexOf(item);
       const count = siblings.length;
       return {
         item,
         angle: -Math.PI / 2 + ((index + 1) / (count + 1)) * Math.PI * 2,
-        // A stable wobble per card, so the ring does not look mechanical.
-        jitter: 0.85 + ((index * 37) % 30) / 100,
-        depth: (((index * 53) % 100) / 100 - 0.5) * 260,
+        // A stable wobble per card, kept tight so cards stay on their ring.
+        jitter: 0.97 + ((index * 37) % 8) / 100,
+        depth: (((index * 53) % 100) / 100 - 0.5) * 120,
       };
     });
   }, [items]);
@@ -236,8 +258,10 @@ export function World({
                           className={`${TONE_CLASS[item.tone]} w-full rounded-[4px] p-4 text-left`}
                         >
                           <span className="label block">{item.kind}</span>
-                          <span className="display mt-1 block text-[22px]">{item.title}</span>
-                          <span className="mt-2 block text-[14px] leading-[1.5]">
+                          <span className="display mt-1 line-clamp-2 block text-[22px]">
+                            {item.title}
+                          </span>
+                          <span className="mt-2 line-clamp-2 block text-[14px] leading-[1.5]">
                             {item.body}
                           </span>
                         </button>
@@ -318,10 +342,14 @@ export function World({
               onClick={() => onOpen?.(item)}
             >
               <span className="label block text-[12px]">{item.kind}</span>
-              <span className="display mt-1 block text-[20px] leading-[1.02]">
+              {/* Two lines each, so no card grows tall enough to hit its
+                  neighbour. The full text is in the glass panel. */}
+              <span className="display mt-1 line-clamp-2 block text-[20px] leading-[1.02]">
                 {item.title}
               </span>
-              <span className="mt-1.5 block text-[14px] leading-[1.35]">{item.body}</span>
+              <span className="mt-1.5 line-clamp-2 block text-[14px] leading-[1.35]">
+                {item.body}
+              </span>
             </button>
           ))}
         </div>

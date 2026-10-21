@@ -9,7 +9,7 @@ export const APP_NAME = "The Dream Job Configurator";
 export const TAGLINE = "Scroll into it. What's close, what's in reach, and what's coming.";
 
 export const SUPPORTING_LINE =
-  "Start with your LinkedIn profile, add the five things it does not show, and leave with a flow.md file of your own and a live read on what is changing.";
+  "Start with your LinkedIn profile. Claude spots the skills you never listed, searches live for the work opening up for you, and builds your world around the job you would love.";
 
 /** The interview questions, in order. Shown to the person as "Question n of 5". */
 export const QUESTIONS = [
