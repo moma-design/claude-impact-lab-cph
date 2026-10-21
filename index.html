@@ -12,7 +12,9 @@
   .sun { width:900px; height:900px; margin:-450px 0 0 -450px; border-radius:50%;
     background:radial-gradient(circle, #f6f1e6 0%, #f6f1e6 14%, #ffe36a 25%, #ffc13a 34%, #ff8a4d 45%, #ff6fae 58%, rgba(255,140,190,.25) 68%, rgba(241,236,226,0) 74%); }
   .ring { overflow:visible; }
-  .ring path { fill:none; stroke:rgba(30,20,20,.5); stroke-width:1.5; stroke-dasharray:6 7; }
+  .ring circle { fill:none; cx:0; cy:0; }
+  .ring .main { stroke:rgba(30,20,20,.5); stroke-width:1.5; stroke-dasharray:6 7; }
+  .ring .ripple { stroke:rgba(30,20,20,.6); stroke-width:1; stroke-dasharray:2 6; }
   .ringlabel { font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; background:#151313; color:#f1ece2; padding:6px 12px; border-radius:3px; white-space:nowrap; transform:translate(-50%,-50%); }
 
   .card { width:var(--w,190px); padding:13px; border-radius:4px; cursor:pointer; font-size:11px; line-height:1.35; transform:translate(-50%,-50%);
@@ -130,24 +132,24 @@ function place() {
   labels.forEach(o => { o.y = -R; });
 }
 
-// each ring is a slow wave: radius ripples around the circle and over time
-function waveR(theta, li, t) {
-  return R * (1 + 0.05 * Math.sin(6 + li * 1.3 + 6 * theta + t * 0.0007 * (li % 2 ? -1 : 1)) + 0.022 * Math.sin(11 * theta - t * 0.0011 + li));
-}
-function waves(t) {
+// each level keeps a clean dashed circle; thin ripples keep spreading out from the centre and fading
+const RIPPLES = 6, SVG = 'http://www.w3.org/2000/svg';
+rings.forEach(o => {
+  o.el.removeChild(o.el.firstChild);
+  const main = document.createElementNS(SVG, 'circle'); main.classList.add('main'); o.el.appendChild(main);
+  o.ripples = Array.from({ length: RIPPLES }, () => { const c = document.createElementNS(SVG, 'circle'); c.classList.add('ripple'); o.el.appendChild(c); return c; });
+});
+function ripples(t) {
   for (const o of rings) {
-    let d = '';
-    for (let i = 0; i <= 180; i++) {
-      const th = i / 180 * Math.PI * 2, r = waveR(th, o.li, t);
-      d += (i ? 'L' : 'M') + (Math.cos(th) * r).toFixed(1) + ' ' + (Math.sin(th) * r).toFixed(1);
-    }
-    o.el.firstChild.setAttribute('d', d + 'Z');
+    o.el.querySelector('.main').setAttribute('r', R);
+    o.ripples.forEach((c, k) => {
+      const p = ((t * 0.00007) + k / RIPPLES + o.li * 0.13) % 1;   // 0 → 1 as each ripple spreads
+      c.setAttribute('r', p * R * 1.18);
+      c.style.opacity = Math.sin(p * Math.PI) * 0.55;
+    });
   }
-  for (const o of cardObjs) {
-    const r = waveR(o.ang, o.li, t) * o.jit;
-    o.x = Math.cos(o.ang) * r * 1.05; o.y = Math.sin(o.ang) * r;
-  }
-  labels.forEach((o, i) => { o.y = -waveR(-Math.PI / 2, i, t); });
+  for (const o of cardObjs) { o.x = Math.cos(o.ang) * R * o.jit * 1.05; o.y = Math.sin(o.ang) * R * o.jit; }
+  labels.forEach(o => { o.y = -R; });
 }
 place(); addEventListener('resize', place);
 
@@ -166,7 +168,7 @@ addEventListener('keydown', e => { if (e.key === 'ArrowDown' || e.key === ' ') t
 const clamp = v => Math.max(0, Math.min(1, v));
 (function tick(t) {
   cam += (target - cam) * 0.08;
-  waves(t || 0);
+  ripples(t || 0);
   const sway = Math.sin((t || 0) / 4000);
   for (const o of objs) {
     const d = o.z + cam - 250;           // distance in front of the camera, positive = behind us
