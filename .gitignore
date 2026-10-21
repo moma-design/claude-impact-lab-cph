@@ -9,3 +9,5 @@ __pycache__/
 .screenshots/
 AGENTS.md
 *.tsbuildinfo
+.superpowers/
+.playwright-mcp/

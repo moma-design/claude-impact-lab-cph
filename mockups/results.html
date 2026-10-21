@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>The Dream Job Configurator</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; overflow:hidden; background:#f1ece2; color:#151313; font-family:"JetBrains Mono", ui-monospace, monospace; }
+  .dots { position:fixed; inset:0; background-image:radial-gradient(circle, rgba(40,30,30,.22) 1px, transparent 1.3px); background-size:26px 26px; }
+  .stage { position:fixed; inset:0; perspective:900px; perspective-origin:50% 50%; overflow:hidden; }
+  .world { position:absolute; left:50%; top:50%; width:0; height:0; transform-style:preserve-3d; }
+  .obj { position:absolute; left:0; top:0; transform-style:preserve-3d; }
+
+  .sun { width:900px; height:900px; margin:-450px 0 0 -450px; border-radius:50%;
+    background:radial-gradient(circle, #f6f1e6 0%, #f6f1e6 14%, #ffe36a 25%, #ffc13a 34%, #ff8a4d 45%, #ff6fae 58%, rgba(255,140,190,.25) 68%, rgba(241,236,226,0) 74%); }
+  .ring { overflow:visible; }
+  .ring circle { fill:none; cx:0; cy:0; }
+  .ring .main { stroke:rgba(30,20,20,.5); stroke-width:1.5; stroke-dasharray:6 7; }
+  .ring .ripple { stroke:rgba(30,20,20,.6); stroke-width:1; stroke-dasharray:2 6; }
+  .ringlabel { font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; background:#151313; color:#f1ece2; padding:6px 12px; border-radius:3px; white-space:nowrap; transform:translate(-50%,-50%); }
+
+  .card { width:var(--w,190px); padding:13px; border-radius:4px; cursor:pointer; font-size:11px; line-height:1.35; transform:translate(-50%,-50%);
+    box-shadow:0 14px 30px -18px rgba(40,20,20,.55); transition: scale .2s, box-shadow .2s; }
+  .card:hover { scale:1.07; box-shadow:0 20px 44px -18px rgba(40,20,20,.7); }
+  .card .k { font-size:.78em; font-weight:700; text-transform:uppercase; letter-spacing:.1em; opacity:.75; }
+  .card .t { font-family:Anton, Impact, sans-serif; text-transform:uppercase; font-size:1.6em; line-height:1.02; margin-top:4px; }
+  .card .b { margin-top:6px; opacity:.85; }
+  .strength { background:#fbf8f1; }
+  .quote { background:#ff6fae; }
+  .step { background:#151313; color:#ffe36a; }
+  .path { background:#ffe500; }
+  .reach { background:#fbf8f1; border-left:4px solid #ff8a4d; }
+  .signal { background:#fbf8f1; border-left:3px solid #151313; }
+
+  .head { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); text-align:center; z-index:6; pointer-events:none; transition:opacity .4s; }
+  .head .brand { display:inline-block; font-size:clamp(16px,1.9vw,24px); font-weight:700; letter-spacing:.14em; text-transform:uppercase; background:#151313; color:#f1ece2; padding:.5em .9em; border-radius:4px; margin-bottom:22px; }
+  .head .h { font-family:Anton, Impact, sans-serif; font-size:clamp(64px,10vw,150px); line-height:.9; text-transform:uppercase; }
+  .head .m { font-size:13px; text-transform:uppercase; letter-spacing:.04em; margin:18px auto 0; max-width:40ch; line-height:1.5; }
+  .nav { position:fixed; right:28px; top:50%; transform:translateY(-50%); z-index:6; display:flex; flex-direction:column; gap:10px; }
+  .nav button { font:700 10px "JetBrains Mono", monospace; letter-spacing:.12em; text-transform:uppercase; text-align:right; background:none; border:0; cursor:pointer; color:rgba(21,19,19,.4); padding:4px 0; }
+  .nav button.on { color:#151313; }
+  .nav button::after { content:''; display:inline-block; width:18px; height:2px; background:currentColor; margin-left:8px; vertical-align:middle; transition:width .3s; }
+  .nav button.on::after { width:34px; }
+  .hint { position:fixed; bottom:22px; left:50%; transform:translateX(-50%); z-index:6; font-size:11px; letter-spacing:.14em; text-transform:uppercase; transition:opacity .4s; }
+
+  .scrim { position:fixed; inset:0; z-index:19; background:rgba(241,236,226,.25); backdrop-filter:blur(10px) saturate(1.2); -webkit-backdrop-filter:blur(10px) saturate(1.2); opacity:0; pointer-events:none; transition:opacity .3s; }
+  .scrim.open { opacity:1; pointer-events:auto; }
+  .detail { position:fixed; left:50%; top:50%; transform:translate(-50%,-46%) scale(.92); opacity:0; pointer-events:none; width:min(460px,90vw); padding:30px 30px 26px; z-index:20; border-radius:10px;
+    background:linear-gradient(140deg, rgba(255,255,255,.55), rgba(255,255,255,.18));
+    backdrop-filter:blur(24px) saturate(1.6); -webkit-backdrop-filter:blur(24px) saturate(1.6);
+    border:1px solid rgba(255,255,255,.7); box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 30px 80px -30px rgba(80,30,40,.55);
+    transition: transform .4s cubic-bezier(.2,.9,.25,1.15), opacity .25s; }
+  .detail.open { opacity:1; transform:translate(-50%,-50%) scale(1); pointer-events:auto; }
+  .detail .glow { position:absolute; inset:-1px; border-radius:10px; pointer-events:none; background:radial-gradient(circle at 85% 0%, rgba(255,193,58,.45), transparent 45%), radial-gradient(circle at 0% 100%, rgba(255,111,174,.35), transparent 50%); mix-blend-mode:multiply; }
+  .detail .k, .detail h2, .detail p { position:relative; }
+  .detail .k { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; opacity:.7; padding-right:40px; }
+  .detail h2 { font-family:Anton, Impact, sans-serif; font-weight:400; text-transform:uppercase; font-size:40px; line-height:.98; margin:10px 0 14px; }
+  .detail p { font-size:14px; line-height:1.6; margin:0; }
+  .detail .x { position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:50%; border:1px solid rgba(21,19,19,.25); background:rgba(255,255,255,.4); font:16px/1 "JetBrains Mono", monospace; cursor:pointer; }
+</style></head>
+<body>
+<div class="dots"></div>
+<div class="stage"><div class="world" id="world"></div></div>
+<div class="head" id="head"><div class="brand">The Dream Job Configurator</div><div class="h">The world<br>is yours.</div><div class="m">Scroll into it. What's close, what's in reach, and what's coming.</div></div>
+<div class="nav" id="nav"></div>
+<div class="hint" id="hint">Scroll ↓ to go deeper</div>
+<div class="scrim" id="scrim"></div>
+<div class="detail" id="detail" role="dialog" aria-modal="true" aria-labelledby="dt"><div class="glow"></div><button class="x" id="dx" aria-label="Close">×</button><div class="k" id="dk"></div><h2 id="dt"></h2><p id="db"></p></div>
+
+<script>
+const LEVELS = [
+  { name:'Already yours', items:[
+    {c:'strength', k:'Strength', t:'You notice what is missing', b:'Nineteen years of spotting the dose that does not fit.'},
+    {c:'quote', k:'You said', t:'"I want to matter again"', b:'Every path here keeps patients at the centre.'},
+    {c:'strength', k:'Strength', t:'Trusted at 3am', b:'Calm under pressure is rarer than any certificate.'},
+    {c:'step', k:'This week', t:'One email. 20 minutes.', b:'Ask the digital health lead about the AI prescribing pilot.'},
+    {c:'strength', k:'Strength', t:'You explain hard things', b:'Junior doctors still ask for you by name.'},
+    {c:'strength', k:'Strength', t:'Ethics instinct', b:'You ask who gets hurt before anyone else does.'},
+    {c:'strength', k:'Strength', t:'Systems thinker', b:'You see how a ward, a pharmacy and a supplier fit together.'},
+  ]},
+  { name:'Within reach', items:[
+    {c:'path', k:'Path · Guardian', t:'Clinical AI safety lead', b:'Hospitals deploying AI prescribing need someone who knows where errors hide.'},
+    {c:'reach', k:'Who to talk to', t:'Your trust\'s CCIO', b:'The chief clinical information officer runs the AI roadmap.'},
+    {c:'path', k:'Path · Translator', t:'Medication data steward', b:'Every model in medicine needs a human who knows what the numbers mean on a ward.'},
+    {c:'reach', k:'Skill to add', t:'Data literacy', b:'A short course is enough to speak the language.'},
+    {c:'path', k:'Path · Teacher', t:'AI-era pharmacy educator', b:'Teach judgement, not procedure.'},
+    {c:'reach', k:'A week could look like', t:'Tue: teach a cohort', b:'A session on when to overrule the model.'},
+    {c:'reach', k:'A week could look like', t:'Thu: vendor review', b:'Test a new tool against your own edge cases.'},
+    {c:'reach', k:'The human part', t:'You are the judgement', b:'The tool proposes. You decide what is safe.'},
+  ]},
+  { name:'On the horizon', items:[
+    {c:'signal', k:'Signal', t:'Oversight becomes law', b:'High-risk medical AI must have human oversight.'},
+    {c:'signal', k:'Signal', t:'AI pilots double', b:'More trusts trial AI medication checks.'},
+    {c:'signal', k:'Signal', t:'Safety roles rising', b:'Clinical safety officer roles up this year.'},
+    {c:'signal', k:'Signal', t:'Vendors need clinicians', b:'Health AI startups hiring clinical advisors.'},
+    {c:'signal', k:'Signal', t:'Patients ask about AI', b:'Explaining AI decisions becomes part of care.'},
+    {c:'signal', k:'Signal', t:'Pharmacy roles reshape', b:'Dispensing automates; advisory work grows.'},
+    {c:'signal', k:'Signal', t:'New standards bodies', b:'Clinical AI assurance needs practitioners.'},
+  ]},
+];
+
+const GAP = 1500, world = document.getElementById('world'), objs = [];
+function add(el, x, y, z, fixed) { el.classList.add('obj'); world.appendChild(el); const o = { el, x, y, z, fixed }; objs.push(o); return o; }
+
+// the sun waits at the far end
+const sunEl = document.createElement('div'); sunEl.className = 'sun';
+add(sunEl, 0, 0, -GAP * 3 - 600, true);
+
+let R = 0;
+const rings = [], labels = [], cardObjs = [];
+LEVELS.forEach((lvl, li) => {
+  const z = -li * GAP;
+  const ring = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  ring.classList.add('ring');
+  ring.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
+  const ro = add(ring, 0, 0, z, true); ro.li = li;
+  rings.push(ro);
+  const lab = document.createElement('div'); lab.className = 'ringlabel'; lab.textContent = lvl.name;
+  labels.push(add(lab, 0, 0, z + 10, false));
+  lvl.items.forEach((it, i) => {
+    const el = document.createElement('div'); el.className = `card ${it.c}`;
+    el.innerHTML = `<div class="k">${it.k}</div><div class="t">${it.t}</div><div class="b">${it.b}</div>`;
+    el.onclick = () => openBox(`${lvl.name} · ${it.k}`, it.t, it.b);
+    const n = lvl.items.length;
+    const o = add(el, 0, 0, z + 20 + Math.random() * 130, false);   // always in front of the ring line
+    o.ang = -Math.PI / 2 + (i + 1) / (n + 1) * Math.PI * 2; o.li = li; o.jit = .85 + Math.random() * .3;  // gap at the top for the ring label
+    cardObjs.push(o);
+  });
+});
+
+function place() {
+  R = Math.min(innerWidth, innerHeight) * 0.42;
+  const S = R * 1.2;   // room for the wave crests
+  rings.forEach(o => { o.el.setAttribute('width', S * 2); o.el.setAttribute('height', S * 2); o.el.setAttribute('viewBox', `${-S} ${-S} ${S * 2} ${S * 2}`); o.el.style.margin = `${-S}px 0 0 ${-S}px`; });
+  labels.forEach(o => { o.y = -R; });
+}
+
+// each level keeps a clean dashed circle; thin ripples keep spreading out from the centre and fading
+const RIPPLES = 6, SVG = 'http://www.w3.org/2000/svg';
+rings.forEach(o => {
+  o.el.removeChild(o.el.firstChild);
+  const main = document.createElementNS(SVG, 'circle'); main.classList.add('main'); o.el.appendChild(main);
+  o.ripples = Array.from({ length: RIPPLES }, () => { const c = document.createElementNS(SVG, 'circle'); c.classList.add('ripple'); o.el.appendChild(c); return c; });
+});
+function ripples(t) {
+  for (const o of rings) {
+    o.el.querySelector('.main').setAttribute('r', R);
+    o.ripples.forEach((c, k) => {
+      const p = ((t * 0.00007) + k / RIPPLES + o.li * 0.13) % 1;   // 0 → 1 as each ripple spreads
+      c.setAttribute('r', p * R * 1.18);
+      c.style.opacity = Math.sin(p * Math.PI) * 0.55;
+    });
+  }
+  for (const o of cardObjs) { o.x = Math.cos(o.ang) * R * o.jit * 1.05; o.y = Math.sin(o.ang) * R * o.jit; }
+  labels.forEach(o => { o.y = -R; });
+}
+place(); addEventListener('resize', place);
+
+// nav
+const nav = document.getElementById('nav');
+const navBtns = LEVELS.map((l, i) => { const b = document.createElement('button'); b.textContent = l.name; b.onclick = () => target = i * GAP; nav.appendChild(b); return b; });
+
+let cam = 0, target = 0;
+const MAX = GAP * 2 + 400;
+addEventListener('wheel', e => { if (!box.classList.contains('open')) target = Math.max(0, Math.min(MAX, target + e.deltaY * 1.4)); }, { passive:true });
+let ty = null;
+addEventListener('touchstart', e => ty = e.touches[0].clientY, { passive:true });
+addEventListener('touchmove', e => { if (ty === null) return; target = Math.max(0, Math.min(MAX, target + (ty - e.touches[0].clientY) * 3)); ty = e.touches[0].clientY; }, { passive:true });
+addEventListener('keydown', e => { if (e.key === 'ArrowDown' || e.key === ' ') target = Math.min(MAX, target + 400); if (e.key === 'ArrowUp') target = Math.max(0, target - 400); });
+
+const clamp = v => Math.max(0, Math.min(1, v));
+(function tick(t) {
+  cam += (target - cam) * 0.08;
+  ripples(t || 0);
+  const sway = Math.sin((t || 0) / 4000);
+  for (const o of objs) {
+    const d = o.z + cam - 380;           // distance in front of the camera, positive = behind us
+    let op = 1, s = 1;
+    if (!o.fixed) {
+      op = clamp((d + 2600) / 900) * clamp((650 - d) / 350);   // fade in from the distance, fade out as it passes
+      s = .6 + .4 * clamp((d + 1800) / 900);                     // pop: grows as it arrives
+    } else {
+      op = o.el.classList.contains('sun') ? 1 : clamp((d + 3200) / 1500) * clamp((700 - d) / 300);
+    }
+    const drift = o.fixed ? 0 : sway * 8;
+    o.el.style.transform = `translate3d(${o.x + drift}px, ${o.y}px, ${d}px) scale(${s})` + (o.el.classList.contains('card') || o.el.classList.contains('ringlabel') ? ' translate(-50%,-50%)' : '');
+    o.el.style.opacity = op;
+    o.el.style.pointerEvents = op > .4 ? 'auto' : 'none';
+  }
+  const lvl = Math.min(2, Math.floor((cam + GAP / 2) / GAP));
+  navBtns.forEach((b, i) => b.classList.toggle('on', i === lvl));
+  document.getElementById('head').style.opacity = clamp(1 - cam / 600);
+  document.getElementById('hint').style.opacity = clamp(1 - cam / 300);
+  requestAnimationFrame(tick);
+})();
+
+const box = document.getElementById('detail'), scrim = document.getElementById('scrim');
+function openBox(k, t, b) {
+  document.getElementById('dk').textContent = k; document.getElementById('dt').textContent = t; document.getElementById('db').textContent = b;
+  box.classList.add('open'); scrim.classList.add('open'); document.getElementById('dx').focus();
+}
+function closeBox() { box.classList.remove('open'); scrim.classList.remove('open'); }
+scrim.onclick = closeBox; document.getElementById('dx').onclick = closeBox;
+addEventListener('keydown', e => { if (e.key === 'Escape') closeBox(); });
+</script>
+</body></html>

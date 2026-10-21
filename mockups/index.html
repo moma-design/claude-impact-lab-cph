@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Dream Job Configurator</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  html,body { margin:0; min-height:100%; background:#f1ece2; color:#151313; font-family:"JetBrains Mono", ui-monospace, monospace; }
+  body { background-image:radial-gradient(circle, rgba(40,30,30,.22) 1px, transparent 1.3px); background-size:26px 26px; }
+
+  .wrap { display:grid; grid-template-columns:minmax(0, 560px) 1fr; gap:40px; min-height:100vh; padding:36px 40px; }
+  @media (max-width: 960px) { .wrap { grid-template-columns:1fr; padding:24px 16px; } .scene { order:-1; height:46vh; } }
+
+  .brand { display:inline-block; font-size:clamp(14px,1.5vw,18px); font-weight:700; letter-spacing:.14em; text-transform:uppercase; background:#151313; color:#f1ece2; padding:.5em .9em; border-radius:4px; }
+  h1 { font-family:Anton, Impact, sans-serif; font-weight:400; text-transform:uppercase; font-size:clamp(42px,5vw,68px); line-height:.94; margin:26px 0 18px; }
+  .lede { font-size:13px; line-height:1.6; max-width:52ch; margin:0 0 30px; }
+
+  .card { background:#fbf8f1; border-radius:4px; padding:24px; box-shadow:0 14px 30px -18px rgba(40,20,20,.45); }
+  .step { display:flex; align-items:baseline; gap:12px; margin-bottom:14px; }
+  .num { font-family:Anton, Impact, sans-serif; font-size:24px; }
+  .label { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+  .help { font-size:12px; color:#5b4d4d; margin:-6px 0 14px; }
+  .divide { height:1px; background:repeating-linear-gradient(90deg, rgba(21,19,19,.35) 0 5px, transparent 5px 11px); margin:24px 0; }
+
+  .scale { display:grid; grid-template-columns:repeat(10, 1fr); gap:6px; border:0; padding:0; margin:0; }
+  .scale label { position:relative; aspect-ratio:1; display:flex; align-items:center; justify-content:center; border:1px solid rgba(21,19,19,.25); border-radius:4px; font-weight:700; font-size:14px; cursor:pointer; background:#fff; transition:background .15s, color .15s, transform .15s; }
+  .scale label:hover { transform:translateY(-2px); border-color:#151313; }
+  .scale input { position:absolute; opacity:0; inset:0; cursor:pointer; }
+  .scale label:has(input:checked) { background:#151313; color:#ffe36a; border-color:#151313; }
+  .scale label:has(input:focus-visible) { outline:2px solid #ff6fae; outline-offset:2px; }
+  .ends { display:flex; justify-content:space-between; font-size:11px; text-transform:uppercase; letter-spacing:.06em; margin-top:8px; color:#5b4d4d; }
+
+  .drop { display:flex; align-items:center; gap:16px; border:1.5px dashed rgba(21,19,19,.45); border-radius:4px; padding:18px; cursor:pointer; background:#fff; transition:border-color .2s, background .2s; }
+  .drop:hover, .drop.over { border-color:#151313; background:#fff9e0; }
+  .drop .icon { flex:none; width:44px; height:52px; border-radius:3px; background:#ffe500; display:flex; align-items:flex-end; justify-content:center; padding-bottom:6px; font-size:10px; font-weight:700; }
+  .drop b { display:block; font-size:13px; }
+  .drop span { font-size:12px; color:#5b4d4d; }
+  .drop input { display:none; }
+  .url { display:flex; align-items:center; border:1.5px solid rgba(21,19,19,.35); border-radius:4px; background:#fff; transition:border-color .2s, box-shadow .2s; }
+  .url:focus-within { border-color:#151313; box-shadow:0 0 0 3px #ffe500; }
+  .url .pre { flex:none; padding:16px 0 16px 16px; font-size:14px; font-weight:700; color:#5b4d4d; }
+  .url input { flex:1; min-width:0; border:0; outline:0; background:none; padding:16px 8px 16px 2px; font:14px "JetBrains Mono", monospace; color:#151313; }
+  .url .ok { flex:none; width:28px; height:28px; margin-right:12px; border-radius:50%; background:#151313; color:#ffe36a; display:flex; align-items:center; justify-content:center; font-size:14px; opacity:0; transform:scale(.6); transition:.25s; }
+  .url.valid .ok { opacity:1; transform:scale(1); }
+  .urlnote { font-size:11px; margin:8px 0 0; min-height:1em; color:#5b4d4d; }
+  details { margin-top:14px; }
+  summary { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; cursor:pointer; }
+  textarea { width:100%; margin-top:12px; min-height:120px; resize:vertical; border:1px solid rgba(21,19,19,.25); border-radius:4px; padding:12px; font:13px/1.55 "JetBrains Mono", monospace; background:#fff; color:#151313; }
+
+  .go { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; margin-top:26px; padding:18px 22px; border:0; border-radius:4px; background:#151313; color:#ffe36a; font-family:Anton, Impact, sans-serif; font-size:24px; text-transform:uppercase; letter-spacing:.02em; cursor:pointer; text-decoration:none; transition:transform .15s; }
+  .go:hover { transform:translateY(-2px); }
+  .go .arrow { font-family:"JetBrains Mono", monospace; font-size:20px; }
+  .fine { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; margin-top:12px; }
+  .example { margin-top:22px; font-size:12px; line-height:1.6; }
+  .example a { color:#151313; font-weight:700; text-underline-offset:4px; }
+
+  /* the scene: you, at the centre of everything that's coming */
+  .scene { position:relative; min-height:420px; }
+  .scene svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .scene .main { fill:none; stroke:rgba(30,20,20,.5); stroke-width:1.5; stroke-dasharray:6 7; }
+  .scene .ripple { fill:none; stroke:rgba(30,20,20,.6); stroke-width:1; stroke-dasharray:2 6; }
+  .sun { position:absolute; left:50%; top:50%; border-radius:50%; transform:translate(-50%,-50%);
+    transition:width 1.2s cubic-bezier(.2,.8,.2,1), height 1.2s cubic-bezier(.2,.8,.2,1), filter 1.2s; animation:breathe 9s ease-in-out infinite alternate; }
+  @keyframes breathe { from { scale:1; } to { scale:1.05; } }
+  .you { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); font-family:Anton, Impact, sans-serif; font-size:clamp(36px,4vw,56px); letter-spacing:.02em; }
+  .tag { position:absolute; transform:translate(-50%,-50%); font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; background:#151313; color:#f1ece2; padding:5px 10px; border-radius:3px; white-space:nowrap; }
+  .mood { position:absolute; left:50%; bottom:2%; transform:translateX(-50%); font-size:11px; text-transform:uppercase; letter-spacing:.12em; text-align:center; }
+</style></head>
+<body>
+<div class="wrap">
+  <main>
+    <div class="brand">The Dream Job Configurator</div>
+    <h1>Your career, read from what you know.</h1>
+    <p class="lede">Rather than your job title. Start with your LinkedIn profile, add the five things it does not show, and leave with a flow.md file of your own and a live read on what is changing.</p>
+
+    <form class="card" onsubmit="event.preventDefault(); location.href = document.getElementById('toConvo').href">
+      <div class="step"><span class="num">01</span><span class="label" id="feel-label">How do you feel about AI and your work right now?</span></div>
+      <fieldset class="scale" aria-labelledby="feel-label" id="scale"></fieldset>
+      <div class="ends"><span>1 · worried</span><span id="chosen" aria-live="polite">Nothing chosen yet</span><span>10 · excited</span></div>
+
+      <div class="divide"></div>
+
+      <div class="step"><span class="num">02</span><span class="label">Your LinkedIn profile</span></div>
+      <p class="help">Paste the link to your profile. Copy it from the address bar on LinkedIn.</p>
+      <label class="url" id="urlbox">
+        <span class="pre">linkedin.com/in/</span>
+        <input type="text" id="url" inputmode="url" autocomplete="url" placeholder="ingrid-dahl" aria-label="Your LinkedIn profile URL">
+        <span class="ok" id="ok" aria-hidden="true">✓</span>
+      </label>
+      <p class="urlnote" id="urlnote" aria-live="polite"></p>
+      <details>
+        <summary>Or paste your profile text</summary>
+        <textarea placeholder="Senior clinical pharmacist, acute medicine. Nineteen years in hospital pharmacy..." aria-label="Profile text"></textarea>
+      </details>
+
+      <a id="toConvo" href="conversation.html" hidden></a>
+      <button class="go" type="submit"><span>Start the conversation</span><span class="arrow">→</span></button>
+      <div class="fine"><span>Nothing is saved.</span><span>Then five questions</span></div>
+    </form>
+
+    <p class="example"><a href="results.html">Try with an example person</a><br>Ingrid Dahl, hospital pharmacist (invented). A fictional profile and conversation, written for this demo. It goes straight to the results.</p>
+  </main>
+
+  <aside class="scene" id="scene" aria-hidden="true">
+    <div class="sun" id="sun"></div>
+    <svg id="rings"></svg>
+    <div class="you">YOU</div>
+    <div class="mood" id="mood">Pick a number. Watch your sun.</div>
+  </aside>
+</div>
+
+<script>
+// feeling scale
+const scale = document.getElementById('scale');
+for (let i = 1; i <= 10; i++) {
+  const l = document.createElement('label');
+  l.innerHTML = `<input type="radio" name="feeling" value="${i}" aria-label="${i} of 10">${i}`;
+  scale.appendChild(l);
+}
+
+// the sun follows the feeling: 1 is a low dusk glow, 10 is full morning
+const sun = document.getElementById('sun'), mood = document.getElementById('mood');
+function paintSun(v) {
+  const k = (v - 1) / 9;                       // 0 → 1
+  const R = Math.min(scene.clientWidth, scene.clientHeight) * 0.5;
+  const size = R * (0.62 + k * 0.78);          // diameter: from inside "Already yours" to past it
+  const core = 12 + k * 6;
+  sun.style.width = sun.style.height = size + 'px';
+  sun.style.background = `radial-gradient(circle, #f6f1e6 0%, #f6f1e6 ${core}%, ${k > .35 ? '#ffe36a' : '#e9a6c9'} ${core + 11}%, ${k > .2 ? '#ffc13a' : '#b87bd1'} ${core + 20}%, ${k > .1 ? '#ff8a4d' : '#8a63c9'} ${core + 31}%, #ff6fae ${core + 44}%, rgba(255,140,190,.25) ${core + 54}%, rgba(241,236,226,0) ${core + 60}%)`;
+  sun.style.filter = `saturate(${.55 + k * .6})`;
+}
+const scene = document.getElementById('scene');
+paintSun(4);
+addEventListener('resize', () => paintSun(+(document.querySelector('input[name=feeling]:checked')?.value || 4)));
+scale.addEventListener('change', e => {
+  const v = +e.target.value;
+  document.getElementById('chosen').textContent = `Chosen: ${v} of 10`;
+  paintSun(v);
+  mood.textContent = v <= 3 ? "Fair enough. Let's find the light." : v <= 7 ? 'Somewhere in between. Good place to start.' : "Let's make the most of it.";
+});
+
+// LinkedIn URL: accept a full link or just the handle
+const url = document.getElementById('url'), urlbox = document.getElementById('urlbox'), urlnote = document.getElementById('urlnote');
+url.addEventListener('input', () => {
+  const v = url.value.trim();
+  const m = v.match(/(?:linkedin\.com\/in\/)?([A-Za-z0-9\-_%]{3,100})\/?$/);
+  const full = v.includes('linkedin.com/in/');
+  if (full) url.value = m ? m[1] : v.replace(/^.*linkedin\.com\/in\//, '');   // keep just the handle; the prefix shows the rest
+  urlbox.classList.toggle('valid', !!m);
+  urlnote.textContent = !v || m ? '' : 'That does not look like a profile link yet.';
+});
+
+// rings + ripples, same language as the results page
+const NS = 'http://www.w3.org/2000/svg', svg = document.getElementById('rings');
+const NAMES = ['Already yours', 'Within reach', 'On the horizon'];
+const mains = NAMES.map(() => { const c = document.createElementNS(NS, 'circle'); c.classList.add('main'); svg.appendChild(c); return c; });
+const rips = Array.from({ length: 7 }, () => { const c = document.createElementNS(NS, 'circle'); c.classList.add('ripple'); svg.appendChild(c); return c; });
+const tags = NAMES.map(n => { const d = document.createElement('div'); d.className = 'tag'; d.textContent = n; scene.appendChild(d); return d; });
+(function tick(t) {
+  const w = scene.clientWidth, h = scene.clientHeight, cx = w / 2, cy = h / 2;
+  const R = Math.min(w, h) * 0.5;
+  const radii = [R * .48, R * .72, R * .96];
+  mains.forEach((c, i) => { c.setAttribute('cx', cx); c.setAttribute('cy', cy); c.setAttribute('r', radii[i]); });
+  tags.forEach((d, i) => { const a = -Math.PI / 2 + (i - 1) * 0.55; d.style.left = cx + Math.cos(a) * radii[i] + 'px'; d.style.top = cy + Math.sin(a) * radii[i] + 'px'; });
+  rips.forEach((c, k) => {
+    const p = ((t || 0) * 0.00006 + k / rips.length) % 1;
+    c.setAttribute('cx', cx); c.setAttribute('cy', cy); c.setAttribute('r', p * R * 1.05);
+    c.style.opacity = Math.sin(p * Math.PI) * .5;
+  });
+  requestAnimationFrame(tick);
+})();
+</script>
+</body></html>
