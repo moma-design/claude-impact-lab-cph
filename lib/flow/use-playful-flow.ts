@@ -1,0 +1,393 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import type { Profile } from "@/lib/app-config";
+import {
+  EXAMPLE_PERSON_FEELING,
+  EXAMPLE_PERSON_PROFILE,
+} from "@/lib/example-person";
+import { MAX_LIGHTS_UP } from "./lights-up";
+import type {
+  FlowContext,
+  FlowPayload,
+  Opportunity,
+  Skill,
+  SkillsPayload,
+  TaskChoice,
+} from "./types";
+
+export type Stage = "start" | "skills" | "lights" | "opportunities" | "flow";
+
+const GENERIC_ERROR = "Something went wrong. Try again.";
+const UNREACHABLE = "Could not reach the server. Is the dev server still running?";
+
+/** Shown one after another in the existing Thinking component while searching. */
+export const SEARCH_NOTES = [
+  "Looking at current openings",
+  "Looking at fractional roles",
+  "Looking at new fields",
+  "Checking sources",
+];
+
+async function postJson<T>(url: string, body: unknown): Promise<T> {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const payload = (await response.json().catch(() => null)) as
+    | (T & { error?: string })
+    | null;
+  if (!response.ok || !payload) {
+    throw new Error(payload?.error ?? GENERIC_ERROR);
+  }
+  return payload;
+}
+
+export function usePlayfulFlow() {
+  const [stage, setStage] = useState<Stage>("start");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isExample, setIsExample] = useState(false);
+
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [feelingBefore, setFeelingBefore] = useState<number | null>(null);
+  const [feelingNow, setFeelingNow] = useState<number | null>(null);
+
+  /* Step 2 */
+  const [whereIComeFrom, setWhereIComeFrom] = useState("");
+  const [proposedSkills, setProposedSkills] = useState<Skill[]>([]);
+  const [skillIndex, setSkillIndex] = useState(0);
+  const [confirmedSkills, setConfirmedSkills] = useState<Skill[]>([]);
+  const [extraSkill, setExtraSkill] = useState("");
+
+  /* Step 3 */
+  const [lightsUp, setLightsUp] = useState<string[]>([]);
+  const [tasks, setTasks] = useState<TaskChoice[]>([]);
+
+  /* Step 4 */
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+  const [opportunityIndex, setOpportunityIndex] = useState(0);
+  const [interested, setInterested] = useState<Opportunity[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchNote, setSearchNote] = useState(SEARCH_NOTES[0]);
+  const [savedExample, setSavedExample] = useState(false);
+
+  /* Step 5 */
+  const [flow, setFlow] = useState<FlowPayload | null>(null);
+  const [flowMarkdown, setFlowMarkdown] = useState("");
+
+  /** Guards against a second early search while the first is still in flight. */
+  const searchStarted = useRef(false);
+
+  useEffect(() => {
+    if (!searching) return;
+    let index = 0;
+    const timer = window.setInterval(() => {
+      index = (index + 1) % SEARCH_NOTES.length;
+      setSearchNote(SEARCH_NOTES[index]);
+    }, 6000);
+    return () => window.clearInterval(timer);
+  }, [searching]);
+
+  const runSearch = useCallback(
+    async (options: {
+      surprise?: boolean;
+      flowMarkdown?: string;
+      skills: Skill[];
+      where: string;
+      picks?: string[];
+      taskChoices?: TaskChoice[];
+      shown: string[];
+      example: boolean;
+      append: boolean;
+    }) => {
+      setSearching(true);
+      setError(null);
+      try {
+        const payload = await postJson<{
+          opportunities: Opportunity[];
+          savedExample: boolean;
+        }>("/api/opportunities", {
+          isExample: options.example,
+          surprise: options.surprise ?? false,
+          whereIComeFrom: options.where,
+          skills: options.skills,
+          extraSkill: extraSkill.trim() || undefined,
+          lightsUp: options.picks,
+          keeps: options.taskChoices?.filter((t) => t.keep).map((t) => t.label),
+          handsOver: options.taskChoices?.filter((t) => !t.keep).map((t) => t.label),
+          flowMarkdown: options.flowMarkdown,
+          alreadyShown: options.shown,
+        });
+        setSavedExample(payload.savedExample);
+        setOpportunities((current) =>
+          options.append ? [...current, ...payload.opportunities] : payload.opportunities,
+        );
+        if (!options.append) setOpportunityIndex(0);
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : UNREACHABLE);
+      } finally {
+        setSearching(false);
+      }
+    },
+    [extraSkill],
+  );
+
+  const loadSkills = useCallback(async (nextProfile: Profile) => {
+    setBusy(true);
+    setError(null);
+    try {
+      const payload = await postJson<SkillsPayload>("/api/skills", {
+        profile: nextProfile,
+      });
+      setWhereIComeFrom(payload.where_i_come_from);
+      setProposedSkills(payload.skills);
+      setTasks(payload.tasks.map((label) => ({ label, keep: true })));
+      setSkillIndex(0);
+      setConfirmedSkills([]);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : UNREACHABLE);
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
+  const start = useCallback(
+    (nextProfile: Profile, nextFeeling: number | null) => {
+      setProfile(nextProfile);
+      setFeelingBefore(nextFeeling);
+      setIsExample(false);
+      setStage("skills");
+      void loadSkills(nextProfile);
+    },
+    [loadSkills],
+  );
+
+  const startExample = useCallback(() => {
+    setProfile(EXAMPLE_PERSON_PROFILE);
+    setFeelingBefore(EXAMPLE_PERSON_FEELING);
+    setIsExample(true);
+    setStage("skills");
+    void loadSkills(EXAMPLE_PERSON_PROFILE);
+  }, [loadSkills]);
+
+  const reactToSkill = useCallback(
+    (thatsMe: boolean) => {
+      const skill = proposedSkills[skillIndex];
+      if (!skill) return;
+      if (thatsMe) setConfirmedSkills((current) => [...current, skill]);
+      setSkillIndex((current) => current + 1);
+    },
+    [proposedSkills, skillIndex],
+  );
+
+  /** Confirms step 2 and starts the live research behind step 3. */
+  const confirmSkills = useCallback(() => {
+    setStage("lights");
+    if (searchStarted.current) return;
+    searchStarted.current = true;
+    void runSearch({
+      skills: confirmedSkills,
+      where: whereIComeFrom,
+      shown: [],
+      example: isExample,
+      append: false,
+    });
+  }, [confirmedSkills, isExample, runSearch, whereIComeFrom]);
+
+  const toggleLight = useCallback((value: string) => {
+    setLightsUp((current) => {
+      if (current.includes(value)) return current.filter((item) => item !== value);
+      if (current.length >= MAX_LIGHTS_UP) return current;
+      return [...current, value];
+    });
+  }, []);
+
+  const setTaskKeep = useCallback((label: string, keep: boolean) => {
+    setTasks((current) =>
+      current.map((task) => (task.label === label ? { ...task, keep } : task)),
+    );
+  }, []);
+
+  const confirmLights = useCallback(() => {
+    setStage("opportunities");
+    // The early search is usually still running or already back. Only retry
+    // here if it failed, and then with this step's picks folded in.
+    if (!searching && opportunities.length === 0) {
+      void runSearch({
+        skills: confirmedSkills,
+        where: whereIComeFrom,
+        picks: lightsUp,
+        taskChoices: tasks,
+        shown: [],
+        example: isExample,
+        append: false,
+      });
+    }
+  }, [
+    confirmedSkills,
+    isExample,
+    lightsUp,
+    opportunities.length,
+    runSearch,
+    searching,
+    tasks,
+    whereIComeFrom,
+  ]);
+
+  const reactToOpportunity = useCallback(
+    (reaction: "interested" | "not-for-me") => {
+      const opportunity = opportunities[opportunityIndex];
+      if (!opportunity) return;
+      if (reaction === "interested") {
+        setInterested((current) => [...current, opportunity]);
+      }
+      setOpportunityIndex((current) => current + 1);
+    },
+    [opportunities, opportunityIndex],
+  );
+
+  const surpriseMe = useCallback(() => {
+    void runSearch({
+      surprise: true,
+      skills: confirmedSkills,
+      where: whereIComeFrom,
+      picks: lightsUp,
+      taskChoices: tasks,
+      shown: opportunities.map((item) => item.title),
+      example: isExample,
+      append: true,
+    });
+  }, [confirmedSkills, isExample, lightsUp, opportunities, runSearch, tasks, whereIComeFrom]);
+
+  const buildContext = useCallback(
+    (): FlowContext => ({
+      whereIComeFrom,
+      confirmedSkills,
+      extraSkill,
+      lightsUp,
+      tasks,
+      interested,
+    }),
+    [confirmedSkills, extraSkill, interested, lightsUp, tasks, whereIComeFrom],
+  );
+
+  const finish = useCallback(async () => {
+    setStage("flow");
+    setBusy(true);
+    setError(null);
+    try {
+      const payload = await postJson<{ flow: FlowPayload; flowMarkdown: string }>(
+        "/api/flow",
+        { context: buildContext() },
+      );
+      setFlow(payload.flow);
+      setFlowMarkdown(payload.flowMarkdown);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : UNREACHABLE);
+    } finally {
+      setBusy(false);
+    }
+  }, [buildContext]);
+
+  /** Step 5: run the research again, this time from flow.md. */
+  const findNewOpportunities = useCallback(() => {
+    setStage("opportunities");
+    void runSearch({
+      skills: confirmedSkills,
+      where: whereIComeFrom,
+      picks: lightsUp,
+      taskChoices: tasks,
+      flowMarkdown,
+      shown: opportunities.map((item) => item.title),
+      example: isExample,
+      append: true,
+    });
+  }, [
+    confirmedSkills,
+    flowMarkdown,
+    isExample,
+    lightsUp,
+    opportunities,
+    runSearch,
+    tasks,
+    whereIComeFrom,
+  ]);
+
+  const restart = useCallback(() => {
+    searchStarted.current = false;
+    setStage("start");
+    setBusy(false);
+    setError(null);
+    setIsExample(false);
+    setProfile(null);
+    setFeelingBefore(null);
+    setFeelingNow(null);
+    setWhereIComeFrom("");
+    setProposedSkills([]);
+    setSkillIndex(0);
+    setConfirmedSkills([]);
+    setExtraSkill("");
+    setLightsUp([]);
+    setTasks([]);
+    setOpportunities([]);
+    setOpportunityIndex(0);
+    setInterested([]);
+    setSearching(false);
+    setSavedExample(false);
+    setFlow(null);
+    setFlowMarkdown("");
+  }, []);
+
+  const retrySkills = useCallback(() => {
+    if (profile) void loadSkills(profile);
+  }, [loadSkills, profile]);
+
+  return {
+    stage,
+    busy,
+    error,
+    isExample,
+    feelingBefore,
+    feelingNow,
+    setFeelingNow,
+
+    start,
+    startExample,
+    restart,
+
+    whereIComeFrom,
+    proposedSkills,
+    skillIndex,
+    confirmedSkills,
+    extraSkill,
+    setExtraSkill,
+    reactToSkill,
+    confirmSkills,
+    retrySkills,
+
+    lightsUp,
+    toggleLight,
+    tasks,
+    setTaskKeep,
+    confirmLights,
+
+    opportunities,
+    opportunityIndex,
+    interested,
+    searching,
+    searchNote,
+    savedExample,
+    reactToOpportunity,
+    surpriseMe,
+    finish,
+
+    flow,
+    flowMarkdown,
+    findNewOpportunities,
+  };
+}
+
+export type PlayfulFlow = ReturnType<typeof usePlayfulFlow>;
