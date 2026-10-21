@@ -236,3 +236,66 @@ Finish your reply with the item as JSON inside a fenced block marked json, and n
 export function roleVideoUserPrompt(roleTitle: string): string {
   return `Find me a video of someone talking about working as: ${roleTitle}. An interview, a talk or a podcast episode. Search now.`;
 }
+
+/* Open roles, searched from the dream job */
+
+export const OPEN_ROLES_SYSTEM_PROMPT = `You search for current, public job postings close to one person's dream job, near where they work.
+
+Search job boards and employers' own careers pages now. Return three to five postings.
+
+For each:
+- title: the advertised job title, as written.
+- organisation: who is advertising.
+- location: the town, city or region on the posting.
+- why_close: one sentence of sixteen words at most on why it sits close to their dream job.
+- url: copied character for character from the search result, including any query string. A URL you did not see in a result is thrown away before the person sees it, so never write one from memory.
+
+Rules:
+- Real, current, public postings only. No agencies' generic landing pages where you cannot see a role, and no invented employers.
+- No salary figures unless the posting states them and you attribute them in why_close.
+- If you find fewer than three real postings, return what you found. Returning none is better than inventing one.
+- Plain British English. No emoji, no dashes used as punctuation, no exclamation marks.
+
+Finish your reply with the postings as JSON inside a fenced block marked json, and nothing after it:
+
+\`\`\`json
+{"roles":[{"title":"...","organisation":"...","location":"...","why_close":"...","url":"https://..."}]}
+\`\`\``;
+
+export function openRolesUserPrompt(dreamJobTitle: string, whereIComeFrom: string): string {
+  return [
+    `My dream job: ${dreamJobTitle}`,
+    `Where I work now, in my own words: ${whereIComeFrom}`,
+    "Find current public job postings close to that dream job, near where I am. Search now.",
+  ].join("\n\n");
+}
+
+/* The LinkedIn draft */
+
+export const LINKEDIN_SYSTEM_PROMPT = `You draft a LinkedIn update for someone, using only what they have confirmed about themselves in this session.
+
+Return:
+- headline: one line, under 120 characters. What they do and what they are known for. No slogans, no "passionate about", no buzzwords.
+- about: at most five short lines, each one sentence of twenty words at most. Written in the first person. The first line says what they do and for how long. The rest draw on their confirmed skills, including the ones they had never listed, each grounded in the evidence they confirmed rather than asserted flat.
+- skills: their confirmed skills as a plain list, in the words they confirmed, most distinctive first.
+
+Hard rules:
+- Use only the skills and evidence given to you. Invent no employer, no job title they did not confirm, no dates, no achievements, no figures.
+- A hidden skill may only appear if its evidence is carried with it, so the claim stands up.
+- Plain, warm British English, first person. No emoji, no dashes used as punctuation, no exclamation marks, no hashtags.
+
+Finish your reply with the draft as JSON inside a fenced block marked json, and nothing after it:
+
+\`\`\`json
+{"headline":"...","about":["...","..."],"skills":["...","..."]}
+\`\`\``;
+
+export function linkedInUserPrompt(skills: Skill[], extraSkill: string): string {
+  return [
+    `My confirmed skills, with the evidence I agreed to:\n${skillLines(skills)}`,
+    extraSkill.trim() ? `Something I added myself: ${extraSkill.trim()}` : "",
+    "Draft my LinkedIn update.",
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}

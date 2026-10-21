@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 
-import type { FlowPayload, Opportunity } from "@/lib/flow/types";
+import type { FlowPayload, OpenRole, Opportunity } from "@/lib/flow/types";
+import { appendOpenRoles } from "@/lib/flow/flow-markdown";
 import type { WorldItem } from "@/lib/flow/world";
 
-import { DetailPanel, toPanel } from "../detail-panel";
+import { DetailPanel, toPanel, type PanelContent } from "../detail-panel";
 import { ErrorNote, primaryButton, quietLink, secondaryButton, Thinking } from "../ui";
+import { OpenRoles } from "./open-roles";
 import { World } from "../world";
 
 interface YourFlowProps {
@@ -14,6 +16,7 @@ interface YourFlowProps {
   flowMarkdown: string;
   interested: Opportunity[];
   worldItems: WorldItem[];
+  whereIComeFrom: string;
   isExample: boolean;
   busy: boolean;
   error: string | null;
@@ -29,6 +32,7 @@ export function YourFlow({
   flowMarkdown,
   interested,
   worldItems,
+  whereIComeFrom,
   isExample,
   busy,
   error,
@@ -39,11 +43,15 @@ export function YourFlow({
   onRestart,
 }: YourFlowProps) {
   const [open, setOpen] = useState<WorldItem | null>(null);
+  const [panel, setPanel] = useState<PanelContent | null>(null);
+  const [openRoles, setOpenRoles] = useState<OpenRole[]>([]);
   const [showFlow, setShowFlow] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  const fullMarkdown = appendOpenRoles(flowMarkdown, openRoles);
+
   function download() {
-    const blob = new Blob([flowMarkdown], { type: "text/markdown;charset=utf-8" });
+    const blob = new Blob([fullMarkdown], { type: "text/markdown;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -56,7 +64,7 @@ export function YourFlow({
 
   async function copy() {
     try {
-      await navigator.clipboard.writeText(flowMarkdown);
+      await navigator.clipboard.writeText(fullMarkdown);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2500);
     } catch {
@@ -105,6 +113,14 @@ export function YourFlow({
         <span className="label inline-block">This week.</span>{" "}
         {flow.step_this_week.action}
       </p>
+      <OpenRoles
+        dreamJobTitle={flow.dream_job.title}
+        whereIComeFrom={whereIComeFrom}
+        isExample={isExample}
+        onRoles={setOpenRoles}
+        onDetails={setPanel}
+      />
+
       <div className="relative mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={() => setShowFlow(true)} className={primaryButton}>
           Your flow.md
@@ -137,7 +153,13 @@ export function YourFlow({
         centre={dreamJob}
       />
 
-      <DetailPanel item={open ? toPanel(open) : null} onClose={() => setOpen(null)} />
+      <DetailPanel
+        item={panel ?? (open ? toPanel(open) : null)}
+        onClose={() => {
+          setPanel(null);
+          setOpen(null);
+        }}
+      />
 
       {/* After the rings: the file, the score, and another search. */}
       {showFlow ? (

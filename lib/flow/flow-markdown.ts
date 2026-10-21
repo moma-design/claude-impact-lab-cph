@@ -2,6 +2,7 @@ import {
   OPPORTUNITY_TYPE_LABELS,
   type FlowContext,
   type FlowPayload,
+  type OpenRole,
 } from "./types";
 
 function list(lines: string[]): string {
@@ -107,5 +108,26 @@ Who to talk to: ${flow.step_this_week.who_to_talk_to}
 ## Watching for
 
 ${list(flow.watching_for)}
+`;
+}
+
+/**
+ * The open roles are searched after flow.md is built, so they are appended
+ * rather than woven in. Called on the client when the search returns.
+ */
+export function appendOpenRoles(markdown: string, roles: OpenRole[]): string {
+  if (roles.length === 0) return markdown;
+  const list = roles
+    .map(
+      (role) =>
+        `- [${role.title}](${role.url}), ${role.organisation}, ${role.location}. ${role.why_close}`,
+    )
+    .join("\n");
+  return `${markdown}
+## Open roles I found
+
+Found today. Check before applying.
+
+${list}
 `;
 }

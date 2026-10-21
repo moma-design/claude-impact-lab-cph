@@ -191,3 +191,29 @@ export interface LevelUp {
   /** Card names the person tapped "I'll collect this" on. */
   collecting: string[];
 }
+
+/* Open roles close to the dream job */
+
+export const OpenRoleSchema = z.object({
+  title: z.string(),
+  organisation: z.string(),
+  location: z.string(),
+  why_close: z.string(),
+  url: z.string(),
+});
+
+export const OpenRolesSchema = z.object({
+  roles: z.array(OpenRoleSchema),
+});
+
+export type OpenRole = z.infer<typeof OpenRoleSchema>;
+
+/* The LinkedIn draft, written from confirmed skills only */
+
+export const LinkedInDraftSchema = z.object({
+  headline: z.string(),
+  about: z.array(z.string()),
+  skills: z.array(z.string()),
+});
+
+export type LinkedInDraft = z.infer<typeof LinkedInDraftSchema>;

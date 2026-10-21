@@ -90,6 +90,7 @@ export default function Home() {
       flowMarkdown={flow.flowMarkdown}
       interested={flow.interested}
       worldItems={flow.worldItems}
+      whereIComeFrom={flow.whereIComeFrom}
       heldCount={flow.heldCount}
       toCollectCount={flow.toCollectCount}
       isExample={flow.isExample}
