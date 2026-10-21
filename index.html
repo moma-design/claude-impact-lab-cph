@@ -30,10 +30,10 @@
   .reach { background:#fbf8f1; border-left:4px solid #ff8a4d; }
   .signal { background:#fbf8f1; border-left:3px solid #151313; }
 
-  .head { position:fixed; left:32px; top:26px; z-index:6; pointer-events:none; transition:opacity .4s; }
-  .head .brand { display:inline-block; font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; background:#151313; color:#f1ece2; padding:5px 10px; border-radius:3px; margin-bottom:14px; }
-  .head .h { font-family:Anton, Impact, sans-serif; font-size:clamp(40px,5.2vw,72px); line-height:.92; text-transform:uppercase; }
-  .head .m { font-size:12px; text-transform:uppercase; letter-spacing:.04em; margin-top:12px; max-width:34ch; line-height:1.5; }
+  .head { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); text-align:center; z-index:6; pointer-events:none; transition:opacity .4s; }
+  .head .brand { display:inline-block; font-size:clamp(16px,1.9vw,24px); font-weight:700; letter-spacing:.14em; text-transform:uppercase; background:#151313; color:#f1ece2; padding:.5em .9em; border-radius:4px; margin-bottom:22px; }
+  .head .h { font-family:Anton, Impact, sans-serif; font-size:clamp(64px,10vw,150px); line-height:.9; text-transform:uppercase; }
+  .head .m { font-size:13px; text-transform:uppercase; letter-spacing:.04em; margin:18px auto 0; max-width:40ch; line-height:1.5; }
   .nav { position:fixed; right:28px; top:50%; transform:translateY(-50%); z-index:6; display:flex; flex-direction:column; gap:10px; }
   .nav button { font:700 10px "JetBrains Mono", monospace; letter-spacing:.12em; text-transform:uppercase; text-align:right; background:none; border:0; cursor:pointer; color:rgba(21,19,19,.4); padding:4px 0; }
   .nav button.on { color:#151313; }
