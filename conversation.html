@@ -7,13 +7,21 @@
   html,body { margin:0; height:100%; overflow:hidden; background:#f1ece2; color:#151313; font-family:"JetBrains Mono", ui-monospace, monospace; }
   body { background-image:radial-gradient(circle, rgba(40,30,30,.22) 1px, transparent 1.3px); background-size:26px 26px; }
 
-  .top { position:fixed; left:0; right:0; top:0; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:24px 32px; z-index:10; justify-content:flex-end; }
+  .top { position:fixed; left:0; right:0; top:0; display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; padding:24px 32px; z-index:10; }
   .brand { position:fixed; left:50%; top:58vh; transform:translate(-50%,-50%); z-index:0; white-space:nowrap; font-family:Anton, Impact, sans-serif; font-size:7.9vw; line-height:.9; text-transform:uppercase; letter-spacing:.005em; color:#151313; pointer-events:none; }
-  .prog { display:flex; align-items:center; gap:12px; font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
-  .segs { display:flex; gap:4px; }
-  .segs i { width:26px; height:6px; border-radius:2px; background:rgba(21,19,19,.15); transition:background .5s; }
-  .segs i.on { background:#151313; }
-  .segs i.now { background:linear-gradient(90deg,#ff6fae,#ffc13a); }
+  .top::before { content:''; position:absolute; inset:0 0 -60px 0; z-index:-1; pointer-events:none; background:linear-gradient(to bottom, #f1ece2 0%, #f1ece2 62%, rgba(241,236,226,0) 100%); }
+  .prog { display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .prog #progLabel { font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
+  .segs { --sw:clamp(92px,11vw,136px); position:relative; display:flex; gap:0; align-items:flex-start; }
+  .segs::before { content:''; position:absolute; left:calc(var(--sw) / 2); right:calc(var(--sw) / 2); top:21px; height:3px; border-radius:3px; background:rgba(21,19,19,.12); }
+  .segs .fill { position:absolute; left:calc(var(--sw) / 2); top:21px; height:3px; border-radius:3px; width:0; background:linear-gradient(90deg,#151313,#151313 70%,#ff6fae); transition:width .9s cubic-bezier(.2,.8,.2,1); }
+  .step { position:relative; z-index:1; width:var(--sw); display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .step b { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:Anton, Impact, sans-serif; font-weight:400; font-size:20px; background:rgba(255,255,255,.7); border:1.5px solid rgba(21,19,19,.2); color:rgba(21,19,19,.4); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); transition:all .5s; }
+  .step span { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:rgba(21,19,19,.4); text-align:center; transition:color .5s; }
+  .step.on b { background:#151313; border-color:#151313; color:#ffe36a; }
+  .step.on span { color:#151313; }
+  .step.now b { background:linear-gradient(135deg,#ff6fae,#ffc13a); border-color:transparent; color:#151313; transform:scale(1.18); box-shadow:0 0 0 6px rgba(255,111,174,.18), 0 10px 24px -10px rgba(255,111,174,.8); }
+  .step.now span { color:#151313; }
 
   /* jobs drifting up and away */
   .sky { position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden; }
@@ -42,6 +50,16 @@
   .q h2 { font-family:Anton, Impact, sans-serif; font-weight:400; text-transform:uppercase; font-size:clamp(26px,2.8vw,36px); line-height:1.02; margin:0 0 18px; }
   .q textarea { width:100%; min-height:110px; resize:vertical; border:1px solid rgba(21,19,19,.2); border-radius:10px; padding:12px; font:13.5px/1.6 "JetBrains Mono", monospace; background:rgba(255,255,255,.7); color:#151313; }
   .q .answer { font-size:13px; line-height:1.6; background:rgba(255,255,255,.6); border-radius:10px; padding:12px 14px; border-left:3px solid #151313; }
+  .pills-label { font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; opacity:.6; margin:-4px 0 10px; }
+  .pills { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .pill { font:600 12px "JetBrains Mono", monospace; padding:8px 13px; border-radius:999px; border:1px solid rgba(21,19,19,.22); background:rgba(255,255,255,.55); color:#151313; cursor:pointer;
+    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); transition:background .15s, color .15s, transform .15s, border-color .15s; }
+  .pill:hover { transform:translateY(-1px); border-color:#151313; }
+  .pill.on { background:#151313; color:#ffe36a; border-color:#151313; }
+  .pill.on::before { content:'✓ '; }
+  .pill:focus-visible { outline:2px solid #ff6fae; outline-offset:2px; }
+  .pills.picked { margin:0 0 10px; }
+  .pills.picked .pill { cursor:default; padding:6px 11px; font-size:11px; }
   .row { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; flex-wrap:wrap; }
   .hint { font-size:11px; opacity:.6; }
   .actions { display:flex; align-items:center; gap:16px; }
@@ -61,7 +79,7 @@
 <body>
 <div class="brand" aria-hidden="true">The Dream Job Configurator</div>
 <div class="top">
-  <div class="prog"><span id="progLabel" aria-live="polite">Question 1 of 5</span><div class="segs" id="segs"><i></i><i></i><i></i><i></i><i></i></div></div>
+  <div class="prog"><span id="progLabel" aria-live="polite">Question 1 of 5</span><div class="segs" id="segs"><i class="fill" id="fill"></i></div></div>
 </div>
 
 <div class="sky" id="sky" aria-hidden="true"></div>
@@ -83,7 +101,9 @@ const TURNS = [
     jobs:[{c:'y', k:'Maybe', t:'Medication safety lead'}, {c:'c', k:'Already yours', t:'Rewrote the insulin chart'}, {c:'c', k:'People come to you', t:"The 4 o'clock clinic"}] },
   { reflect:"So you redesigned the chart the whole trust still prescribes insulin on, and you run the unofficial four o'clock surgery. Is that right?",
     q:'Which skills do you have that you have never listed?',
-    a:'Reading the gap between the chart and the person. Also saying no to a consultant without a row. And teaching, properly, at the bedside.',
+    a:'Reading the gap between the chart and the person. Also saying no to a consultant without a row.',
+    pillLabel:'Tap the skills that are yours',
+    pills:['Teaching at the bedside*', 'Spotting drug interactions*', 'Saying no to seniors*', 'Calming worried families', 'Writing guidelines', 'Medicines reconciliation', 'Mentoring juniors', 'Risk assessment', 'Explaining complex things*', 'Audit & data'],
     jobs:[{c:'p', k:'Maybe', t:'Clinical educator'}, {c:'c', k:'Unlisted skill', t:'Reading the gap'}, {c:'d', k:'Maybe', t:'AI safety reviewer'}] },
   { reflect:'You read the gap between the chart and the life the person lives, you can refuse a senior colleague without a fight, and you teach at the bedside. Is that right?',
     q:'Which parts of your work give you energy, and which would you happily hand to AI tomorrow?',
@@ -95,7 +115,9 @@ const TURNS = [
     jobs:[{c:'p', k:'Maybe', t:'Clinical AI safety lead'}, {c:'c', k:'Keep doing', t:'Walking the ward'}] },
   { reflect:'You have to keep seeing patients, because the judgement comes from being on the ward, not from the screen. Is that right? Last one:',
     q:'What matters in what comes next: freedom, stability, variety, impact, place?',
-    a:'Variety and impact, in that order. I want to stay in the north west, and the income has to be reliable. But I do not need all of it from one employer any more.',
+    a:'Variety, then impact. I do not need all of it from one employer any more.',
+    pillLabel:'Pick what matters most',
+    pills:['Freedom', 'Stability', 'Variety*', 'Impact*', 'Place*', 'Reliable income*', 'Part-time', 'Remote work', 'Learning', 'Working with people'],
     jobs:[{c:'y', k:'Maybe', t:'Portfolio: two roles'}, {c:'c', k:'What matters', t:'Variety, then impact'}, {c:'d', k:'Maybe', t:'Medication data steward'}] },
 ];
 
@@ -113,6 +135,13 @@ const cards = TURNS.map((t, i) => {
   return c;
 });
 
+const STEP_LABELS = ['Not on LinkedIn', 'Hidden skills', 'Energy', 'Keep doing', 'What matters'];
+const steps = STEP_LABELS.map((l, i) => {
+  const d = document.createElement('div'); d.className = 'step';
+  d.innerHTML = `<b>${i + 1}</b><span>${l}</span>`;
+  document.getElementById('segs').appendChild(d); return d;
+});
+
 function centre() {
   const card = cards[Math.min(turn, 4)];
   const x = innerWidth / 2 - (card.offsetLeft + card.offsetWidth / 2);
@@ -122,7 +151,9 @@ addEventListener('resize', centre);
 
 function setProgress() {
   document.getElementById('progLabel').textContent = turn >= 5 ? 'All five questions answered' : `Question ${turn + 1} of 5`;
-  [...document.getElementById('segs').children].forEach((s, i) => { s.className = i < turn ? 'on' : i === turn ? 'now' : ''; });
+  steps.forEach((s, i) => { s.className = 'step' + (i < turn ? ' on' : i === turn ? ' now' : ''); });
+  const a = steps[0], z = steps[Math.min(turn, 4)];
+  document.getElementById('fill').style.width = (z.offsetLeft + z.offsetWidth / 2) - (a.offsetLeft + a.offsetWidth / 2) + 'px';
   cards.forEach((c, i) => c.className = 'q' + (i < turn ? ' done' : i === turn ? ' now' : ''));
 }
 
@@ -141,22 +172,32 @@ async function openCard(i) {
   await sleep(500);
   await typeInto(card.querySelector('.reflect'), t.reflect);
   const slot = card.querySelector('.slot');
-  slot.innerHTML = `<form><textarea aria-label="Your answer" placeholder="Take as much or as little space as you like."></textarea>
+  const pills = (t.pills || []).map(p => { const on = p.endsWith('*'); const label = p.replace(/\*$/, ''); return `<button type="button" class="pill${on ? ' on' : ''}" aria-pressed="${on}">${label}</button>`; }).join('');
+  slot.innerHTML = `<form>${t.pills ? `<div class="pills-label">${t.pillLabel}</div><div class="pills" role="group" aria-label="${t.pillLabel}">${pills}</div>` : ''}<textarea aria-label="Your answer" placeholder="Take as much or as little space as you like."></textarea>
     <div class="row"><span class="hint">⌘ + Enter to send · demo answer filled in</span>
     <div class="actions">${i >= 2 ? `<a class="skip" href="${resultsHref()}">Skip to my results</a>` : ''}<button class="send" type="submit">Send <span class="arrow">→</span></button></div></div></form>`;
   const ta = slot.querySelector('textarea'), form = slot.querySelector('form');
-  ta.value = t.a; ta.focus();
+  slot.querySelectorAll('.pill').forEach(b => b.addEventListener('click', () => {
+    const on = b.classList.toggle('on'); b.setAttribute('aria-pressed', on);
+  }));
+  ta.value = t.a; if (!t.pills) ta.focus();
   ta.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) form.requestSubmit(); });
-  form.addEventListener('submit', e => { e.preventDefault(); submit(i, ta.value.trim()); });
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const chosen = [...slot.querySelectorAll('.pill.on')].map(b => b.textContent);
+    submit(i, ta.value.trim(), chosen);
+  });
   busy = false;
 }
 
-async function submit(i, text) {
-  if (!text || busy) return;
+async function submit(i, text, chosen = []) {
+  if ((!text && !chosen.length) || busy) return;
   busy = true;
   const card = cards[i];
-  card.querySelector('.slot').innerHTML = `<div class="answer"></div>`;
-  card.querySelector('.answer').textContent = text;
+  card.querySelector('.slot').innerHTML = `${chosen.length ? `<div class="pills picked">${chosen.map(c => `<span class="pill on">${c}</span>`).join('')}</div>` : ''}${text ? '<div class="answer"></div>' : ''}`;
+  if (text) card.querySelector('.answer').textContent = text;
+  const kind = TURNS[i].pillLabel?.startsWith('Tap the skills') ? 'Your skill' : 'Matters to you';
+  chosen.slice(0, 3).forEach((c, k) => setTimeout(() => release({ c:'c', k: kind, t: c }, card.getBoundingClientRect()), 900 + k * 420));
   // the jobs this answer suggests rise out of the card and drift away
   const r = card.getBoundingClientRect();
   TURNS[i].jobs.forEach((j, k) => setTimeout(() => release(j, r), 200 + k * 380));
