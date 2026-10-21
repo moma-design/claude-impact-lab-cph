@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 
 import {
-  APP_NAME,
   MAX_PDF_BYTES,
   SUPPORTING_LINE,
   TAGLINE,
@@ -12,7 +11,7 @@ import {
 import { EXAMPLE_PERSON_NAME } from "@/lib/example-person";
 
 import { FeelingScale } from "./feeling-scale";
-import { ErrorNote, Eyebrow, primaryButton, quietLink } from "./ui";
+import { ErrorNote, primaryButton, quietLink } from "./ui";
 
 interface StartScreenProps {
   onStart: (profile: Profile, feeling: number | null) => void;
@@ -65,7 +64,6 @@ export function StartScreen({ onStart, onExample, busy, error }: StartScreenProp
 
   return (
     <main className="relative mx-auto w-full max-w-[680px] px-6 py-16 sm:py-24">
-      <Eyebrow>{APP_NAME}</Eyebrow>
 
       <h1 className="display mt-6 text-[44px] sm:text-[64px]">
         The world

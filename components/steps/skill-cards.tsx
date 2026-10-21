@@ -1,9 +1,8 @@
 "use client";
 
-import { APP_NAME } from "@/lib/app-config";
 import type { Skill } from "@/lib/flow/types";
 
-import { ErrorNote, Eyebrow, primaryButton, quietLink, secondaryButton, Thinking } from "../ui";
+import { ErrorNote, primaryButton, quietLink, secondaryButton, Thinking } from "../ui";
 
 interface SkillCardsProps {
   whereIComeFrom: string;
@@ -38,7 +37,6 @@ export function SkillCards({
   return (
     <main className="mx-auto w-full max-w-[680px] px-6 py-12 sm:py-16">
       <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-dashed border-line pb-5">
-        <Eyebrow>{APP_NAME}</Eyebrow>
         {skills.length > 0 ? (
           <p className="label" aria-live="polite">
             {atEnd ? `${confirmedCount} of ${skills.length} are you` : `Card ${index + 1} of ${skills.length}`}

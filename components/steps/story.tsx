@@ -23,8 +23,8 @@ export function Story({ story }: { story: LevelUpStory }) {
 
   return (
     <div>
-      <p className="text-[13px] font-medium text-accent">{KIND_LABELS[story.kind]}</p>
-      <h3 className="mt-2 text-[19px] leading-snug font-semibold text-ink">{story.title}</h3>
+      <p className="label text-ink">{KIND_LABELS[story.kind]}</p>
+      <h3 className="display mt-2 text-[22px] sm:text-[26px]">{story.title}</h3>
 
       {story.embed_url ? (
         playing ? (
@@ -34,7 +34,7 @@ export function Story({ story }: { story: LevelUpStory }) {
               title={story.title}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
               allowFullScreen
-              className="aspect-video w-full rounded-lg border border-line"
+              className="aspect-video w-full rounded-[4px] border border-ink/20"
             />
           </div>
         ) : (
@@ -46,8 +46,8 @@ export function Story({ story }: { story: LevelUpStory }) {
         )
       ) : null}
 
-      <p className="mt-4 text-[15px] leading-relaxed text-ink">
-        <span className="font-medium">Why watch this. </span>
+      <p className="mt-4 text-[14px] leading-[1.6] text-ink">
+        <span className="label inline-block">Why watch this.</span>{" "}
         {story.why_watch}
       </p>
 
@@ -56,7 +56,7 @@ export function Story({ story }: { story: LevelUpStory }) {
           href={story.source_url}
           target="_blank"
           rel="noreferrer"
-          className="text-accent underline underline-offset-4 hover:text-ink"
+          className="font-bold tracking-[0.08em] text-ink uppercase underline underline-offset-4"
         >
           Open the original
         </a>

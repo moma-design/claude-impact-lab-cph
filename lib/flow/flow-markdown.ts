@@ -54,6 +54,14 @@ export function buildFlowMarkdown(context: FlowContext, flow: FlowPayload): stri
 
   return `# My flow
 
+## My dream job
+
+**${flow.dream_job.title}**
+
+A week could look like:
+
+${list(flow.dream_job.week)}
+
 ## Where I come from
 
 ${context.whereIComeFrom}

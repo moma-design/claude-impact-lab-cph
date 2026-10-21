@@ -8,6 +8,7 @@ import {
   EXAMPLE_PERSON_PROFILE,
 } from "@/lib/example-person";
 import { MAX_LIGHTS_UP } from "./lights-up";
+import { buildWorld } from "./world";
 import type {
   FlowContext,
   FlowPayload,
@@ -78,6 +79,8 @@ export function usePlayfulFlow() {
   const [searching, setSearching] = useState(false);
   const [searchNote, setSearchNote] = useState(SEARCH_NOTES[0]);
   const [savedExample, setSavedExample] = useState(false);
+  /** Titles that came back from Surprise me, so they land on the far ring. */
+  const [surpriseTitles, setSurpriseTitles] = useState<string[]>([]);
 
   /** One story per role, fetched on demand and kept for the session. */
   const [roleStories, setRoleStories] = useState<Record<string, LevelUpStory | null>>({});
@@ -136,6 +139,12 @@ export function usePlayfulFlow() {
           alreadyShown: options.shown,
         });
         setSavedExample(payload.savedExample);
+        if (options.surprise) {
+          setSurpriseTitles((current) => [
+            ...current,
+            ...payload.opportunities.map((item) => item.title),
+          ]);
+        }
         setOpportunities((current) =>
           options.append ? [...current, ...payload.opportunities] : payload.opportunities,
         );
@@ -446,6 +455,7 @@ export function usePlayfulFlow() {
     setInterested([]);
     setSearching(false);
     setSavedExample(false);
+    setSurpriseTitles([]);
     setFlow(null);
     setFlowMarkdown("");
     setLevelUp(null);
@@ -458,7 +468,27 @@ export function usePlayfulFlow() {
     if (profile) void loadSkills(profile);
   }, [loadSkills, profile]);
 
+  const worldItems = buildWorld({
+    confirmedSkills,
+    extraSkill,
+    lightsUp,
+    tasks,
+    interested,
+    surpriseTitles,
+    levelUps,
+    flow,
+    levelUp,
+  });
+
+  const heldCount = levelUps.reduce((total, role) => total + role.held.length, 0);
+  const toCollectCount = levelUps.reduce((total, role) => total + role.toCollect.length, 0);
+
   return {
+    worldItems,
+    heldCount,
+    toCollectCount,
+    surpriseTitles,
+
     stage,
     busy,
     error,

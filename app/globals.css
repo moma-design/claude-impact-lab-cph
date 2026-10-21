@@ -60,6 +60,11 @@ body {
   border-radius: 2px;
 }
 
+.dots {
+  background-image: var(--dots);
+  background-size: 26px 26px;
+}
+
 /* ---- Type ---------------------------------------------------------- */
 
 .display {
@@ -175,9 +180,27 @@ body {
   transform-style: preserve-3d;
 }
 
-.ring {
-  border-radius: 50%;
-  border: var(--ring-line);
+/* His newest rings: a clean dashed circle with thin ripples spreading out.
+   Named depth-ring, not ring: Tailwind owns the "ring" utility and would
+   paint a 1px box-shadow over the whole SVG box. */
+.depth-ring {
+  overflow: visible;
+}
+
+.depth-ring circle {
+  fill: none;
+}
+
+.depth-ring .main {
+  stroke: rgba(30, 20, 20, 0.5);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 7;
+}
+
+.depth-ring .ripple {
+  stroke: rgba(30, 20, 20, 0.6);
+  stroke-width: 1;
+  stroke-dasharray: 2 6;
 }
 
 .ring-label {

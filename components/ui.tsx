@@ -21,6 +21,15 @@ export function Eyebrow({ children }: { children: ReactNode }) {
   return <p className="label">{children}</p>;
 }
 
+/** His black brand badge. Carries the app name on every screen. */
+export function Brand({ children }: { children: ReactNode }) {
+  return (
+    <span className="inline-block rounded-[3px] bg-ink px-2.5 py-[5px] text-[12px] font-bold tracking-[0.14em] text-canvas uppercase">
+      {children}
+    </span>
+  );
+}
+
 /** His display headline. */
 export function Display({
   children,

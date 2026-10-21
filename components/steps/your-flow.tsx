@@ -2,21 +2,26 @@
 
 import { useState } from "react";
 
-import { APP_NAME } from "@/lib/app-config";
-import { OPPORTUNITY_TYPE_LABELS, type FlowPayload, type Opportunity } from "@/lib/flow/types";
+import type { FlowPayload, Opportunity } from "@/lib/flow/types";
+import type { WorldItem } from "@/lib/flow/world";
 
+import { DetailPanel } from "../detail-panel";
 import { FeelingScale } from "../feeling-scale";
-import { ErrorNote, Eyebrow, primaryButton, quietLink, secondaryButton, Thinking } from "../ui";
+import { ErrorNote, primaryButton, quietLink, secondaryButton, Thinking } from "../ui";
+import { World } from "../world";
 
 interface YourFlowProps {
   flow: FlowPayload | null;
   flowMarkdown: string;
   interested: Opportunity[];
+  worldItems: WorldItem[];
   feelingBefore: number | null;
   feelingNow: number | null;
   isExample: boolean;
   busy: boolean;
   error: string | null;
+  heldCount: number;
+  toCollectCount: number;
   onFeelingNow: (value: number) => void;
   onFindNew: () => void;
   onLevelUp?: (opportunity: Opportunity) => void;
@@ -27,16 +32,21 @@ export function YourFlow({
   flow,
   flowMarkdown,
   interested,
+  worldItems,
   feelingBefore,
   feelingNow,
   isExample,
   busy,
   error,
+  heldCount,
+  toCollectCount,
   onFeelingNow,
   onFindNew,
   onLevelUp,
   onRestart,
 }: YourFlowProps) {
+  const [open, setOpen] = useState<WorldItem | null>(null);
+  const [showFlow, setShowFlow] = useState(false);
   const [copied, setCopied] = useState(false);
 
   function download() {
@@ -61,151 +71,186 @@ export function YourFlow({
     }
   }
 
-  return (
-    <main className="mx-auto w-full max-w-[960px] px-6 py-12 sm:py-16">
-      <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-line pb-5">
-        <Eyebrow>{APP_NAME}</Eyebrow>
-        {isExample ? (
-          <p className="text-[13px] text-accent">Example person, invented for this demo</p>
-        ) : null}
-      </header>
-
-      <h1 className="mt-10 text-[30px] leading-tight font-semibold text-ink sm:text-[38px]">
-        Your flow
-      </h1>
-
-      {busy ? (
+  if (busy || !flow) {
+    return (
+      <main className="mx-auto w-full max-w-[680px] px-6 py-24">
+        <h1 className="display text-[40px]">Configuring your dream job</h1>
         <div className="mt-6">
-          <Thinking label="Writing your flow" />
+          {error ? <ErrorNote message={error} /> : <Thinking label="A few seconds" />}
         </div>
-      ) : null}
-
-      {error ? (
-        <div className="mt-6">
-          <ErrorNote message={error} />
-        </div>
-      ) : null}
-
-      {flow ? (
-        <>
-          <p className="mt-4 max-w-[68ch] text-[17px] leading-relaxed text-muted">
-            {flow.closing_line}
-          </p>
-
-          <section className="mt-12 rounded-xl bg-accent-soft p-8 print-plain">
-            <h2 className="text-[24px] font-semibold text-ink">Your step this week</h2>
-            <p className="mt-4 max-w-[68ch] text-[17px] leading-relaxed text-ink">
-              {flow.step_this_week.action}
-            </p>
-            <p className="mt-4 text-[15px] text-muted">
-              About {flow.step_this_week.minutes}.
-            </p>
-            <p className="mt-1 text-[15px] text-muted">
-              <span className="font-medium text-ink">Who to talk to. </span>
-              {flow.step_this_week.who_to_talk_to}
-            </p>
-          </section>
-
-          {interested.length > 0 ? (
-            <section className="mt-16 border-t border-line pt-10">
-              <h2 className="text-[24px] font-semibold text-ink">
-                Opportunities you marked interesting
-              </h2>
-              <ul className="mt-6 space-y-4">
-                {interested.map((opportunity) => (
-                  <li
-                    key={opportunity.title}
-                    className="print-break-avoid rounded-xl border border-line bg-surface p-6 print-plain"
-                  >
-                    <p className="text-[13px] font-medium text-accent">
-                      {OPPORTUNITY_TYPE_LABELS[opportunity.type]}
-                    </p>
-                    <h3 className="mt-2 text-[19px] leading-snug font-semibold text-ink">
-                      {opportunity.title}
-                    </h3>
-                    <p className="mt-3 text-[15px] leading-relaxed text-muted">
-                      {opportunity.why_you}
-                    </p>
-                    <div className="mt-4 flex flex-wrap items-center gap-4 no-print">
-                      {onLevelUp ? (
-                        <button
-                          type="button"
-                          onClick={() => onLevelUp(opportunity)}
-                          className={secondaryButton}
-                        >
-                          Level up
-                        </button>
-                      ) : null}
-                      {opportunity.source_url ? (
-                        <a
-                          href={opportunity.source_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className={quietLink}
-                        >
-                          {opportunity.source_title}
-                        </a>
-                      ) : null}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-
-          <section className="mt-16 border-t border-line pt-10">
-            <h2 className="text-[24px] font-semibold text-ink">Your flow.md</h2>
-            <p className="mt-2 max-w-[68ch] text-[15px] leading-relaxed text-muted">
-              One file that holds who you are, what you want next and what to watch for.
-            </p>
-            <pre className="mt-6 max-h-[420px] overflow-auto rounded-xl border border-line bg-surface p-6 text-[13px] leading-relaxed whitespace-pre-wrap text-ink print-plain">
-              {flowMarkdown}
-            </pre>
-            <div className="mt-5 flex flex-wrap items-center gap-4 no-print">
-              <button type="button" onClick={download} className={primaryButton}>
-                Download flow.md
-              </button>
-              <button type="button" onClick={copy} className={secondaryButton}>
-                {copied ? "Copied" : "Copy"}
-              </button>
-            </div>
-            <p className="mt-4 text-[14px] text-muted">
-              Yours to keep. Paste it into any AI tool.
-            </p>
-          </section>
-
-          <section className="mt-16 border-t border-line pt-10">
-            <FeelingScale
-              name="feeling-after"
-              legend="How do you feel now?"
-              value={feelingNow}
-              onChange={onFeelingNow}
-            />
-            {feelingNow !== null ? (
-              <p className="mt-8 text-[32px] font-semibold text-ink sm:text-[40px]">
-                Before {feelingBefore ?? "not said"} <span className="text-accent">·</span>{" "}
-                Now {feelingNow}
-              </p>
-            ) : null}
-          </section>
-
-          <footer className="mt-16 flex flex-wrap items-center gap-6 border-t border-line pt-8 no-print">
-            <button type="button" onClick={onFindNew} className={primaryButton}>
-              Find new opportunities
-            </button>
-            <button
-              type="button"
-              onClick={() => window.print()}
-              className={secondaryButton}
-            >
-              Print or save as PDF
-            </button>
+        {error ? (
+          <div className="mt-6">
             <button type="button" onClick={onRestart} className={quietLink}>
               Start again
             </button>
-          </footer>
-        </>
+          </div>
+        ) : null}
+      </main>
+    );
+  }
+
+  /* The sun at the centre, opened: the dream job built from what they confirmed. */
+  const dreamJob = (
+    <div className="detail-panel w-[min(560px,92vw)] rounded-[10px] p-8">
+      <div aria-hidden="true" className="detail-glow pointer-events-none absolute -inset-px rounded-[10px]" />
+      <p className="label relative">Your dream job</p>
+      <h2 className="display relative mt-2 text-[34px] leading-[0.98] sm:text-[40px]">
+        {flow.dream_job.title}
+      </h2>
+      <ul className="relative mt-5 space-y-1.5">
+        {flow.dream_job.week.map((line, index) => (
+          <li key={index} className="text-[14px] leading-[1.6] text-ink">
+            {line}
+          </li>
+        ))}
+      </ul>
+      <p className="relative mt-5 text-[14px] leading-[1.6] text-ink">
+        <span className="label inline-block">Cards.</span>{" "}
+        {heldCount} held, {toCollectCount} still to collect.
+      </p>
+      <p className="relative mt-3 text-[14px] leading-[1.6] text-ink">
+        <span className="label inline-block">This week.</span>{" "}
+        {flow.step_this_week.action}
+      </p>
+      <div className="relative mt-6 flex flex-wrap gap-3">
+        <button type="button" onClick={() => setShowFlow(true)} className={primaryButton}>
+          Your flow.md
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      <div className="dots pointer-events-none fixed inset-0 -z-20" aria-hidden="true" />
+
+      <header className="pointer-events-none fixed top-6 left-8 z-10 max-w-[34ch]">
+        <h1 className="display text-[40px] sm:text-[56px]">
+          The world
+          <br />
+          is yours.
+        </h1>
+        <p className="strap mt-3 text-ink">
+          Scroll into it. What&apos;s close, what&apos;s in reach, and what&apos;s coming.
+        </p>
+        {isExample ? <p className="label mt-3">Example person, invented for this demo</p> : null}
+      </header>
+
+      <World
+        items={worldItems}
+        mode="full"
+        warmth={1}
+        onOpen={setOpen}
+        centre={dreamJob}
+      />
+
+      <DetailPanel item={open} onClose={() => setOpen(null)} />
+
+      {/* After the rings: the file, the score, and another search. */}
+      {showFlow ? (
+        <div className="fixed inset-0 z-30 overflow-y-auto bg-canvas">
+          <main className="mx-auto w-full max-w-[960px] px-6 py-12">
+            <div className="flex items-center justify-between gap-4 no-print">
+              <h2 className="display text-[30px] sm:text-[38px]">Your flow</h2>
+              <button type="button" onClick={() => setShowFlow(false)} className={secondaryButton}>
+                Back to the rings
+              </button>
+            </div>
+
+            {interested.length > 0 ? (
+              <section className="mt-12">
+                <h3 className="ring-label inline-block">Marked interesting</h3>
+                <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+                  {interested.map((opportunity) => (
+                    <li
+                      key={opportunity.title}
+                      className="paper-card print-break-avoid rounded-[4px] p-6 print-plain"
+                    >
+                      <p className="label text-ink">{opportunity.type}</p>
+                      <h4 className="display mt-2 text-[22px]">{opportunity.title}</h4>
+                      <p className="mt-3 text-[14px] leading-[1.6] text-ink">
+                        {opportunity.why_you}
+                      </p>
+                      <div className="mt-4 flex flex-wrap items-center gap-4 no-print">
+                        {onLevelUp ? (
+                          <button
+                            type="button"
+                            onClick={() => onLevelUp(opportunity)}
+                            className={secondaryButton}
+                          >
+                            Level up
+                          </button>
+                        ) : null}
+                        {opportunity.source_url ? (
+                          <a
+                            href={opportunity.source_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={quietLink}
+                          >
+                            Source
+                          </a>
+                        ) : null}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+
+            <section className="mt-16 border-t border-dashed border-line pt-10">
+              <h3 className="display text-[28px] sm:text-[34px]">Your flow.md</h3>
+              <p className="mt-2 max-w-[68ch] text-[14px] leading-[1.6] text-muted">
+                One file that holds who you are, what you want next and what to watch for.
+              </p>
+              <pre className="paper-card mt-6 max-h-[420px] overflow-auto rounded-[4px] p-6 text-[13px] leading-relaxed whitespace-pre-wrap text-ink print-plain">
+                {flowMarkdown}
+              </pre>
+              <div className="mt-5 flex flex-wrap items-center gap-4 no-print">
+                <button type="button" onClick={download} className={primaryButton}>
+                  Download flow.md
+                </button>
+                <button type="button" onClick={copy} className={secondaryButton}>
+                  {copied ? "Copied" : "Copy"}
+                </button>
+              </div>
+              <p className="mt-4 text-[14px] text-muted">
+                Yours to keep. Paste it into any AI tool.
+              </p>
+            </section>
+
+            <section className="mt-16 border-t border-dashed border-line pt-10">
+              <FeelingScale
+                name="feeling-after"
+                legend="How do you feel now?"
+                value={feelingNow}
+                onChange={onFeelingNow}
+              />
+              {feelingNow !== null ? (
+                <p className="display mt-8 text-[40px] sm:text-[56px]">
+                  Before {feelingBefore ?? "not said"} · Now {feelingNow}
+                </p>
+              ) : null}
+            </section>
+
+            <footer className="mt-16 flex flex-wrap items-center gap-6 border-t border-dashed border-line pt-8 no-print">
+              <button type="button" onClick={onFindNew} className={primaryButton}>
+                Find new opportunities
+              </button>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className={secondaryButton}
+              >
+                Print or save as PDF
+              </button>
+              <button type="button" onClick={onRestart} className={quietLink}>
+                Start again
+              </button>
+            </footer>
+          </main>
+        </div>
       ) : null}
-    </main>
+    </>
   );
 }

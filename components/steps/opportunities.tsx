@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 
-import { APP_NAME } from "@/lib/app-config";
 import {
   OPPORTUNITY_TYPE_LABELS,
   SKILL_BADGE_LABELS,
@@ -11,7 +10,7 @@ import {
 } from "@/lib/flow/types";
 
 import { Story } from "./story";
-import { ErrorNote, Eyebrow, primaryButton, quietLink, secondaryButton, Thinking } from "../ui";
+import { ErrorNote, primaryButton, quietLink, secondaryButton, Thinking } from "../ui";
 
 interface OpportunitiesProps {
   opportunities: Opportunity[];
@@ -57,10 +56,9 @@ export function Opportunities({
 
   return (
     <main className="mx-auto w-full max-w-[680px] px-6 py-12 sm:py-16">
-      <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-line pb-5">
-        <Eyebrow>{APP_NAME}</Eyebrow>
+      <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-dashed border-line pb-5">
         {opportunities.length > 0 ? (
-          <p className="text-[13px] text-muted" aria-live="polite">
+          <p className="label" aria-live="polite">
             {deckDone
               ? `${interestedCount} marked interesting`
               : `Card ${index + 1} of ${opportunities.length}`}
@@ -68,9 +66,7 @@ export function Opportunities({
         ) : null}
       </header>
 
-      <h1 className="mt-10 text-[30px] leading-tight font-semibold text-ink">
-        Opportunities I found for you
-      </h1>
+      <h1 className="display mt-10 text-[40px] sm:text-[52px]">Opportunities I found for you</h1>
 
       {savedExample ? (
         <p className="mt-4 max-w-[62ch] text-[13px] font-medium text-accent">
@@ -92,39 +88,39 @@ export function Opportunities({
       ) : null}
 
       {card ? (
-        <article className="mt-10 rounded-xl border border-line bg-surface p-6">
-          <p className="text-[13px] font-medium text-accent">
-            {OPPORTUNITY_TYPE_LABELS[card.type]}
-          </p>
-          <h2 className="mt-3 text-[24px] leading-snug font-semibold text-ink">
-            {card.title}
-          </h2>
+        <article className="paper-card paper-card-lift mt-10 rounded-[4px] p-6">
+          <p className="label text-ink">{OPPORTUNITY_TYPE_LABELS[card.type]}</p>
+          <h2 className="display mt-2 text-[30px] sm:text-[38px]">{card.title}</h2>
 
           {(card.skills ?? []).length > 0 ? (
             <ul className="mt-5 flex flex-wrap gap-2">
               {(card.skills ?? []).map((skill) => (
                 <li
                   key={skill.name}
-                  className="rounded-full border border-line px-4 py-2 text-[14px] text-ink"
+                  className={`rounded-[3px] px-4 py-2 text-[14px] text-ink ${
+                    skill.status === "held"
+                      ? "paper-card"
+                      : skill.status === "hidden"
+                        ? "paper-card card-yellow"
+                        : "card-outline"
+                  }`}
                   data-status={skill.status}
                 >
                   {skill.name}{" "}
-                  <span className="text-muted">{SKILL_BADGE_LABELS[skill.status]}</span>
+                  <span className="label inline-block">{SKILL_BADGE_LABELS[skill.status]}</span>
                 </li>
               ))}
             </ul>
           ) : null}
 
-          <p className="mt-5 text-[17px] leading-relaxed text-ink">
-            <span className="font-medium">Why you. </span>
+          <p className="mt-5 text-[14px] leading-[1.6] text-ink">
+            <span className="label inline-block">Why you.</span>{" "}
             {card.why_you}
           </p>
 
-          <div className="mt-5 border-t border-line pt-4">
-            <p className="text-[13px] font-medium text-ink">One skill to add</p>
-            <p className="mt-2 text-[16px] leading-relaxed text-muted">
-              {card.skill_to_add}
-            </p>
+          <div className="mt-5 border-t border-dashed border-line pt-4">
+            <p className="label text-ink">One skill to add</p>
+            <p className="mt-2 text-[14px] leading-[1.6] text-ink">{card.skill_to_add}</p>
             {card.learning_resource_url ? (
               <p className="mt-2 text-[14px]">
                 <a
@@ -151,21 +147,19 @@ export function Opportunities({
               </a>
             </p>
           ) : (
-            <p className="mt-5 text-[14px] text-muted">
+            <p className="mt-5 text-[14px] leading-[1.6] text-muted">
               No source link for this one, so treat it as a direction rather than a listing.
             </p>
           )}
 
-          <div className="mt-5 border-t border-line pt-4">
-            <p className="text-[13px] font-medium text-ink">
-              Meet professionals in this role
-            </p>
+          <div className="mt-5 border-t border-dashed border-line pt-4">
+            <p className="label text-ink">Meet professionals in this role</p>
             {story === undefined ? (
               <div className="mt-3">
                 <Thinking label="Looking for someone who does this" />
               </div>
             ) : story === null ? (
-              <p className="mt-2 text-[15px] leading-relaxed text-muted">
+              <p className="mt-2 text-[14px] leading-[1.6] text-muted">
                 Nothing published turned up for this one.
               </p>
             ) : (
@@ -204,12 +198,12 @@ export function Opportunities({
 
       {deckDone ? (
         <div className="mt-10 space-y-6">
-          <p className="text-[17px] leading-relaxed text-muted">
-            That is everything I found. You can look further afield, or go to your flow.
+          <p className="strap max-w-[42ch] text-ink">
+            That is everything I found. Look further afield, or see your dream job.
           </p>
           <div className="flex flex-wrap items-center gap-4">
             <button type="button" onClick={onFinish} className={primaryButton}>
-              Go to my flow
+              See my dream job
             </button>
             <button
               type="button"

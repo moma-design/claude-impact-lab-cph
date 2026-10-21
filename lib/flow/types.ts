@@ -86,6 +86,11 @@ export const OPPORTUNITY_TYPE_LABELS: Record<OpportunityType, string> = {
 /* Step 5: your flow */
 
 export const FlowSchema = z.object({
+  /** The centre of the rings: one role synthesised from what they confirmed. */
+  dream_job: z.object({
+    title: z.string(),
+    week: z.array(z.string()),
+  }),
   step_this_week: z.object({
     action: z.string(),
     minutes: z.string(),

@@ -89,6 +89,9 @@ export default function Home() {
       flow={flow.flow}
       flowMarkdown={flow.flowMarkdown}
       interested={flow.interested}
+      worldItems={flow.worldItems}
+      heldCount={flow.heldCount}
+      toCollectCount={flow.toCollectCount}
       feelingBefore={flow.feelingBefore}
       feelingNow={flow.feelingNow}
       isExample={flow.isExample}
