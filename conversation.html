@@ -7,8 +7,8 @@
   html,body { margin:0; height:100%; overflow:hidden; background:#f1ece2; color:#151313; font-family:"JetBrains Mono", ui-monospace, monospace; }
   body { background-image:radial-gradient(circle, rgba(40,30,30,.22) 1px, transparent 1.3px); background-size:26px 26px; }
 
-  .top { position:fixed; left:0; right:0; top:0; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:24px 32px; z-index:10; }
-  .brand { display:inline-block; font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; background:#151313; color:#f1ece2; padding:.5em .9em; border-radius:4px; }
+  .top { position:fixed; left:0; right:0; top:0; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:24px 32px; z-index:10; justify-content:flex-end; }
+  .brand { position:fixed; left:50%; top:17vh; transform:translate(-50%,-50%); z-index:0; white-space:nowrap; font-size:4.1vw; font-weight:700; letter-spacing:.14em; text-transform:uppercase; background:#151313; color:#f1ece2; padding:.5em .9em; border-radius:.25em; pointer-events:none; }
   .prog { display:flex; align-items:center; gap:12px; font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
   .segs { display:flex; gap:4px; }
   .segs i { width:26px; height:6px; border-radius:2px; background:rgba(21,19,19,.15); transition:background .5s; }
@@ -23,12 +23,11 @@
   .job.y { background:#ffe500; } .job.c { background:#fbf8f1; } .job.p { background:#ff6fae; } .job.d { background:#151313; color:#ffe36a; }
 
   /* the horizontal question flow */
-  .stage { position:fixed; left:0; right:0; top:50%; transform:translateY(-46%); z-index:5; transition:opacity .8s, transform .8s; }
+  .stage { position:fixed; left:0; right:0; top:58%; transform:translateY(-50%); z-index:5; transition:opacity .8s, transform .8s; }
   .track { display:flex; align-items:center; gap:28px; transition:transform .9s cubic-bezier(.2,.8,.2,1); will-change:transform; }
   .q { flex:none; width:min(640px, 86vw); background:#fbf8f1; border-radius:4px; padding:28px 30px 24px; box-shadow:0 20px 44px -26px rgba(40,20,20,.55);
-    opacity:.35; transform:scale(.9); transition:opacity .7s, transform .7s; }
-  .q.now { opacity:1; transform:scale(1); }
-  .q.done { opacity:.28; }
+    color:rgba(21,19,19,.28); background:#f4efe6; transform:scale(.9); transition:color .7s, background .7s, transform .7s; }
+  .q.now { color:#151313; background:#fbf8f1; transform:scale(1); }
   .q .num { display:flex; align-items:baseline; justify-content:space-between; }
   .q .num b { font-family:Anton, Impact, sans-serif; font-size:42px; font-weight:400; line-height:1; }
   .q .num span { font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; opacity:.6; }
@@ -53,8 +52,8 @@
   .finale .send { font-size:28px; padding:18px 26px; }
 </style></head>
 <body>
+<div class="brand" aria-hidden="true">The Dream Job Configurator</div>
 <div class="top">
-  <div class="brand">The Dream Job Configurator</div>
   <div class="prog"><span id="progLabel" aria-live="polite">Question 1 of 5</span><div class="segs" id="segs"><i></i><i></i><i></i><i></i><i></i></div></div>
 </div>
 
@@ -181,7 +180,7 @@ function release(j, from) {
 function finish() {
   setProgress();
   const stage = document.getElementById('stage');
-  stage.style.opacity = 0; stage.style.transform = 'translateY(-60%)';
+  stage.style.opacity = 0; stage.style.transform = 'translateY(-64%)';
   document.getElementById('finale').classList.add('on');
 }
 
