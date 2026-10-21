@@ -65,7 +65,7 @@
     <h1>Your career, read from what you know.</h1>
     <p class="lede">Rather than your job title. Start with your LinkedIn profile, add the five things it does not show, and leave with a flow.md file of your own and a live read on what is changing.</p>
 
-    <form class="card" onsubmit="event.preventDefault(); location.href='results.html'">
+    <form class="card" onsubmit="event.preventDefault(); location.href = document.querySelector('.example a').href">
       <div class="step"><span class="num">01</span><span class="label" id="feel-label">How do you feel about AI and your work right now?</span></div>
       <fieldset class="scale" aria-labelledby="feel-label" id="scale"></fieldset>
       <div class="ends"><span>1 · worried</span><span id="chosen" aria-live="polite">Nothing chosen yet</span><span>10 · excited</span></div>
