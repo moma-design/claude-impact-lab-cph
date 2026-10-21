@@ -59,6 +59,10 @@
   .pill.on::before { content:'✓ '; }
   .pill:focus-visible { outline:2px solid #ff6fae; outline-offset:2px; }
   .pills.picked { margin:0 0 10px; }
+  .pill.add { border-style:dashed; background:transparent; box-shadow:none; }
+  .pill-input { font:600 12px "JetBrains Mono", monospace; padding:8px 13px; border:2px solid #151313; background:#fff; color:#151313; min-width:190px; outline:none; box-shadow:3px 3px 0 #ffe500; }
+  .send:disabled { opacity:.35; cursor:default; transform:none; box-shadow:none; }
+  .q .pills-label { margin-top:6px; }
   .pills.picked .pill { cursor:default; padding:6px 11px; font-size:11px; }
   .row { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; flex-wrap:wrap; }
   .hint { font-size:11px; opacity:.6; }
@@ -116,28 +120,30 @@
 const TURNS = [
   { reflect:'From your profile: nineteen years in hospital pharmacy, most of it on acute medicine, with medicines safety and teaching running through all of it.',
     q:'What have you done that is not on LinkedIn: side projects, volunteering, things people come to you for?',
-    a:"I rewrote the trust's insulin chart after we had two near misses, and it is still the one in use seven years later. I run an informal clinic for the junior doctors at four o'clock where they bring me the prescriptions they are unsure about.",
-    jobs:[{c:'y', k:'Maybe', t:'Medication safety lead'}, {c:'c', k:'Already yours', t:'Rewrote the insulin chart'}, {c:'c', k:'People come to you', t:"The 4 o'clock clinic"}] },
-  { reflect:"So you redesigned the chart the whole trust still prescribes insulin on, and you run the unofficial four o'clock surgery. Is that right?",
+    groups:[{ label:'Tap everything that fits', kind:'Not on LinkedIn',
+      tags:['Rewrote a guideline*', 'Run an informal clinic*', 'Safety committee*', 'People ask me for advice', 'Mentoring', 'Volunteering', 'Side project', 'Teaching sessions', 'Organised events', 'Wrote for a journal'] }],
+    jobs:[{c:'y', k:'Maybe', t:'Medication safety lead'}] },
+  { reflect:'You rewrote a guideline, you run an informal clinic and you sit on the safety committee. That is a lot nobody outside the hospital sees.',
     q:'Which skills do you have that you have never listed?',
-    a:'Reading the gap between the chart and the person. Also saying no to a consultant without a row.',
-    pillLabel:'Tap the skills that are yours',
-    pills:['Teaching at the bedside*', 'Spotting drug interactions*', 'Saying no to seniors*', 'Calming worried families', 'Writing guidelines', 'Medicines reconciliation', 'Mentoring juniors', 'Risk assessment', 'Explaining complex things*', 'Audit & data'],
-    jobs:[{c:'p', k:'Maybe', t:'Clinical educator'}, {c:'c', k:'Unlisted skill', t:'Reading the gap'}, {c:'d', k:'Maybe', t:'AI safety reviewer'}] },
-  { reflect:'You read the gap between the chart and the life the person lives, you can refuse a senior colleague without a fight, and you teach at the bedside. Is that right?',
+    groups:[{ label:'Tap the skills that are yours', kind:'Your skill',
+      tags:['Teaching at the bedside*', 'Spotting drug interactions*', 'Saying no to seniors*', 'Calming worried families', 'Writing guidelines', 'Medicines reconciliation', 'Mentoring juniors', 'Risk assessment', 'Explaining complex things*', 'Audit & data'] }],
+    jobs:[{c:'p', k:'Maybe', t:'Clinical educator'}, {c:'d', k:'Maybe', t:'AI safety reviewer'}] },
+  { reflect:'You teach, you catch what others miss, and you can say no without a row.',
     q:'Which parts of your work give you energy, and which would you happily hand to AI tomorrow?',
-    a:'Teaching gives me energy, and the honest conversations with families about stopping medicines. I would hand over the reconciliation paperwork and the audit spreadsheets nobody reads.',
-    jobs:[{c:'y', k:'Maybe', t:'Deprescribing specialist'}, {c:'c', k:'Gives you energy', t:'Teaching'}, {c:'d', k:'Hand to AI', t:'Audit spreadsheets'}] },
-  { reflect:'Teaching and the difficult family conversations are what you want more of, and the paperwork is what you would give away. Is that right?',
+    groups:[
+      { label:'Gives me energy', kind:'Gives you energy', tags:['Teaching*', 'Family conversations*', 'Solving puzzles', 'Ward rounds', 'Mentoring', 'Improving systems'] },
+      { label:'Hand to AI tomorrow', kind:'Hand to AI', tags:['Paperwork*', 'Chasing GP lists*', 'Audit spreadsheets*', 'Stock checks', 'Rotas', 'Data entry'] }],
+    jobs:[{c:'y', k:'Maybe', t:'Deprescribing specialist'}] },
+  { reflect:'Teaching and the honest family conversations are what you want more of. The paperwork can go.',
     q:'What do you have to keep doing yourself to stay good at your work?',
-    a:'Seeing patients. The moment I stop walking the ward I lose the thing that makes me useful.',
-    jobs:[{c:'p', k:'Maybe', t:'Clinical AI safety lead'}, {c:'c', k:'Keep doing', t:'Walking the ward'}] },
-  { reflect:'You have to keep seeing patients, because the judgement comes from being on the ward, not from the screen. Is that right? Last one:',
+    groups:[{ label:'Tap what you must keep', kind:'Keep doing',
+      tags:['Seeing patients*', 'Ward rounds*', 'Hands-on checks', 'Teaching juniors', 'Talking to families', 'Reading new guidance', 'Peer review'] }],
+    jobs:[{c:'p', k:'Maybe', t:'Clinical AI safety lead'}] },
+  { reflect:'You stay good by being on the ward, not behind a screen. Last one:',
     q:'What matters in what comes next: freedom, stability, variety, impact, place?',
-    a:'Variety, then impact. I do not need all of it from one employer any more.',
-    pillLabel:'Pick what matters most',
-    pills:['Freedom', 'Stability', 'Variety*', 'Impact*', 'Place*', 'Reliable income*', 'Part-time', 'Remote work', 'Learning', 'Working with people'],
-    jobs:[{c:'y', k:'Maybe', t:'Portfolio: two roles'}, {c:'c', k:'What matters', t:'Variety, then impact'}, {c:'d', k:'Maybe', t:'Medication data steward'}] },
+    groups:[{ label:'Pick what matters most', kind:'Matters to you',
+      tags:['Freedom', 'Stability', 'Variety*', 'Impact*', 'Place*', 'Reliable income*', 'Part-time', 'Remote work', 'Learning', 'Working with people'] }],
+    jobs:[{c:'y', k:'Maybe', t:'Portfolio: two roles'}, {c:'d', k:'Maybe', t:'Medication data steward'}] },
 ];
 
 const track = document.getElementById('track'), sky = document.getElementById('sky');
@@ -191,35 +197,61 @@ async function openCard(i) {
   await sleep(500);
   await typeInto(card.querySelector('.reflect'), t.reflect);
   const slot = card.querySelector('.slot');
-  const pills = (t.pills || []).map(p => { const on = p.endsWith('*'); const label = p.replace(/\*$/, ''); return `<button type="button" class="pill${on ? ' on' : ''}" aria-pressed="${on}">${label}</button>`; }).join('');
-  slot.innerHTML = `<form>${t.pills ? `<div class="pills-label">${t.pillLabel}</div><div class="pills" role="group" aria-label="${t.pillLabel}">${pills}</div>` : ''}<textarea aria-label="Your answer" placeholder="Take as much or as little space as you like."></textarea>
-    <div class="row"><span class="hint">⌘ + Enter to send · demo answer filled in</span>
-    <div class="actions">${i >= 2 ? `<a class="skip" href="${resultsHref()}">Skip to my results</a>` : ''}<button class="send" type="submit">Send <span class="arrow">→</span></button></div></div></form>`;
-  const ta = slot.querySelector('textarea'), form = slot.querySelector('form');
-  slot.querySelectorAll('.pill').forEach(b => b.addEventListener('click', () => {
-    const on = b.classList.toggle('on'); b.setAttribute('aria-pressed', on);
+  const tag = (label, on) => `<button type="button" class="pill${on ? ' on' : ''}" aria-pressed="${on}">${label}</button>`;
+  slot.innerHTML = `<form>${t.groups.map((g, gi) => `
+      <div class="pills-label">${g.label}</div>
+      <div class="pills" role="group" aria-label="${g.label}" data-group="${gi}">
+        ${g.tags.map(x => tag(x.replace(/\*$/, ''), x.endsWith('*'))).join('')}
+        <button type="button" class="pill add">+ Add your own</button>
+      </div>`).join('')}
+    <div class="row"><span class="hint" id="count"></span>
+    <div class="actions">${i >= 2 ? `<a class="skip" href="${resultsHref()}">Skip to my results</a>` : ''}<button class="send" type="submit">Next <span class="arrow">→</span></button></div></div></form>`;
+  const form = slot.querySelector('form'), send = slot.querySelector('.send');
+  const update = () => {
+    const n = slot.querySelectorAll('.pill.on').length;
+    slot.querySelector('#count').textContent = n ? `${n} selected` : 'Pick at least one';
+    send.disabled = !n;
+  };
+  const wire = b => b.addEventListener('click', () => { const on = b.classList.toggle('on'); b.setAttribute('aria-pressed', on); update(); });
+  slot.querySelectorAll('.pill:not(.add)').forEach(wire);
+  // "+ Add your own" turns into a small field; Enter adds it as a selected tag
+  slot.querySelectorAll('.pill.add').forEach(add => add.addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.className = 'pill-input'; input.placeholder = 'Type and press Enter'; input.setAttribute('aria-label', 'Add your own');
+    add.replaceWith(input); input.focus();
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { input.replaceWith(add); return; }
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      const v = input.value.trim();
+      if (v) { const b = document.createElement('button'); b.type = 'button'; b.className = 'pill on'; b.setAttribute('aria-pressed', 'true'); b.textContent = v; wire(b); input.before(b); }
+      input.value = ''; update();
+    });
+    input.addEventListener('blur', () => { if (!input.value.trim()) input.replaceWith(add); });
   }));
-  ta.value = t.a; if (!t.pills) ta.focus();
-  ta.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) form.requestSubmit(); });
+  update();
   form.addEventListener('submit', e => {
     e.preventDefault();
-    const chosen = [...slot.querySelectorAll('.pill.on')].map(b => b.textContent);
-    submit(i, ta.value.trim(), chosen);
+    const chosen = [...slot.querySelectorAll('.pills')].map(p => ({
+      kind: t.groups[+p.dataset.group].kind,
+      tags: [...p.querySelectorAll('.pill.on')].map(b => b.textContent),
+    }));
+    submit(i, chosen);
   });
   busy = false;
 }
 
-async function submit(i, text, chosen = []) {
-  if ((!text && !chosen.length) || busy) return;
+async function submit(i, chosen) {
+  const all = chosen.flatMap(g => g.tags);
+  if (!all.length || busy) return;
   busy = true;
   const card = cards[i];
-  card.querySelector('.slot').innerHTML = `${chosen.length ? `<div class="pills picked">${chosen.map(c => `<span class="pill on">${c}</span>`).join('')}</div>` : ''}${text ? '<div class="answer"></div>' : ''}`;
-  if (text) card.querySelector('.answer').textContent = text;
-  const kind = TURNS[i].pillLabel?.startsWith('Tap the skills') ? 'Your skill' : 'Matters to you';
-  chosen.slice(0, 3).forEach((c, k) => setTimeout(() => release({ c:'c', k: kind, t: c }, card.getBoundingClientRect()), 900 + k * 420));
-  // the jobs this answer suggests rise out of the card and drift away
+  card.querySelector('.slot').innerHTML = chosen.filter(g => g.tags.length).map(g =>
+    `<div class="pills-label">${TURNS[i].groups.find(x => x.kind === g.kind).label}</div><div class="pills picked">${g.tags.map(x => `<span class="pill on">${x}</span>`).join('')}</div>`).join('');
+  // the chosen tags and the jobs they suggest rise out of the card and drift away
   const r = card.getBoundingClientRect();
-  TURNS[i].jobs.forEach((j, k) => setTimeout(() => release(j, r), 200 + k * 380));
+  const rising = [...TURNS[i].jobs, ...chosen.flatMap(g => g.tags.slice(0, 2).map(x => ({ c:'c', k:g.kind, t:x })))];
+  rising.forEach((j, k) => setTimeout(() => release(j, r), 200 + k * 360));
   turn++;
   await sleep(1100);
   if (turn < 5) openCard(turn);
