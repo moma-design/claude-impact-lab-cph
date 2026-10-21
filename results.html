@@ -55,6 +55,15 @@
   .detail h2 { font-family:Anton, Impact, sans-serif; font-weight:400; text-transform:uppercase; font-size:40px; line-height:.98; margin:10px 0 14px; }
   .detail p { font-size:14px; line-height:1.6; margin:0; }
   .detail .x { position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:50%; border:1px solid rgba(21,19,19,.25); background:rgba(255,255,255,.4); font:16px/1 "JetBrains Mono", monospace; cursor:pointer; }
+
+  /* ---- hard: square corners, thick ink outlines, offset shadows, no glass ---- */
+  .ringlabel, .head .brand { border-radius:0; }
+  .card { border-radius:0; border:2px solid #151313; box-shadow:5px 5px 0 #151313; }
+  .card:hover { box-shadow:8px 8px 0 #151313; }
+  .scrim { background:rgba(241,236,226,.82); backdrop-filter:none; -webkit-backdrop-filter:none; }
+  .detail { border-radius:0; border:2.5px solid #151313; background:#fbf8f1; backdrop-filter:none; -webkit-backdrop-filter:none; box-shadow:10px 10px 0 #151313; }
+  .detail .glow { display:none; }
+  .detail .x { border-radius:0; border:2px solid #151313; background:#fff; }
 </style></head>
 <body>
 <div class="dots"></div>

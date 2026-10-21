@@ -64,6 +64,19 @@
   .you { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); font-family:Anton, Impact, sans-serif; font-size:clamp(36px,4vw,56px); letter-spacing:.02em; }
   .tag { position:absolute; transform:translate(-50%,-50%); font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; background:#151313; color:#f1ece2; padding:5px 10px; border-radius:3px; white-space:nowrap; }
   .mood { position:absolute; left:50%; bottom:2%; transform:translateX(-50%); font-size:11px; text-transform:uppercase; letter-spacing:.12em; text-align:center; }
+
+  /* ---- hard: square corners, thick ink outlines, offset shadows ---- */
+  .brand, .tag { border-radius:0; }
+  .card { border-radius:0; border:2.5px solid #151313; box-shadow:8px 8px 0 #151313; }
+  .scale label { border-radius:0; border:2px solid #151313; }
+  .scale label:hover { transform:translate(-1px,-1px); box-shadow:3px 3px 0 #151313; }
+  .scale label:has(input:checked) { box-shadow:3px 3px 0 #ff6fae; }
+  .url { border-radius:0; border:2px solid #151313; }
+  .url:focus-within { box-shadow:5px 5px 0 #ffe500; }
+  .url .ok { border-radius:0; }
+  textarea { border-radius:0; border:2px solid #151313; }
+  .go { border-radius:0; box-shadow:6px 6px 0 #ff6fae; }
+  .go:hover { transform:translate(-2px,-2px); box-shadow:8px 8px 0 #ff6fae; }
 </style></head>
 <body>
 <div class="wrap">
