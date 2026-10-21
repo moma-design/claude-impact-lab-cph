@@ -114,13 +114,13 @@ LEVELS.forEach((lvl, li) => {
   const ro = add(ring, 0, 0, z, true); ro.li = li;
   rings.push(ro);
   const lab = document.createElement('div'); lab.className = 'ringlabel'; lab.textContent = lvl.name;
-  labels.push(add(lab, 0, 0, z, false));
+  labels.push(add(lab, 0, 0, z + 10, false));
   lvl.items.forEach((it, i) => {
     const el = document.createElement('div'); el.className = `card ${it.c}`;
     el.innerHTML = `<div class="k">${it.k}</div><div class="t">${it.t}</div><div class="b">${it.b}</div>`;
     el.onclick = () => openBox(`${lvl.name} · ${it.k}`, it.t, it.b);
     const n = lvl.items.length;
-    const o = add(el, 0, 0, z + (Math.random() - .5) * 260, false);
+    const o = add(el, 0, 0, z + 20 + Math.random() * 130, false);   // always in front of the ring line
     o.ang = -Math.PI / 2 + (i + 1) / (n + 1) * Math.PI * 2; o.li = li; o.jit = .85 + Math.random() * .3;  // gap at the top for the ring label
     cardObjs.push(o);
   });
@@ -172,7 +172,7 @@ const clamp = v => Math.max(0, Math.min(1, v));
   ripples(t || 0);
   const sway = Math.sin((t || 0) / 4000);
   for (const o of objs) {
-    const d = o.z + cam - 250;           // distance in front of the camera, positive = behind us
+    const d = o.z + cam - 380;           // distance in front of the camera, positive = behind us
     let op = 1, s = 1;
     if (!o.fixed) {
       op = clamp((d + 2600) / 900) * clamp((650 - d) / 350);   // fade in from the distance, fade out as it passes
